@@ -89,13 +89,13 @@ namespace DynamicOdata.Service
             string skipTopClause = string.Empty;
             if (topQueryOption != null)
             {
-                int skipValue = skipQueryOption != null ? skipQueryOption.Value : 0;
-                skipTopClause = string.Format("OFFSET {0} ROWS FETCH NEXT {1} ROWS ONLY", skipValue, topQueryOption.Value);
+                int skipValue = skipQueryOption?.Value ?? 0;
+                skipTopClause = $"OFFSET {skipValue} ROWS FETCH NEXT {topQueryOption.Value} ROWS ONLY";
             }
 
             if (topQueryOption == null && skipQueryOption != null)
             {
-                skipTopClause = string.Format("OFFSET {0} ROWS", skipQueryOption.Value);
+                skipTopClause = $"OFFSET {skipQueryOption.Value} ROWS";
             }
 
             return skipTopClause;
@@ -109,7 +109,7 @@ namespace DynamicOdata.Service
             if (string.IsNullOrEmpty(skipTopClause))
                 return orderClause;
 
-            return string.Format("{0} {1}", orderClause, skipTopClause);
+            return $"{orderClause} {skipTopClause}";
         }
 
         public string ToSql()
@@ -117,18 +117,18 @@ namespace DynamicOdata.Service
             string fromClause = FromClause();
             string selectClause = BuildSelectClause(_oDataQueryOptions.SelectExpand);
 
-            string sql = string.Format(@"SELECT {0} FROM {1}", selectClause, fromClause);
+            string sql = $@"SELECT {selectClause} FROM {fromClause}";
 
             string whereClause = BuildWhereClause(_oDataQueryOptions.Filter);
             if (!string.IsNullOrEmpty(whereClause))
             {
-                sql = string.Format("{0} WhERE {1}", sql, whereClause);
+                sql = $"{sql} WhERE {whereClause}";
             }
 
             string orderClause = BuildOrderClause(_oDataQueryOptions.OrderBy, _oDataQueryOptions.Top, _oDataQueryOptions.Skip);
             if (!string.IsNullOrEmpty(orderClause))
             {
-                sql = string.Format("{0} ORDER BY {1}", sql, orderClause);
+                sql = $"{sql} ORDER BY {orderClause}";
             }
 
             return sql;
@@ -137,12 +137,12 @@ namespace DynamicOdata.Service
         public string ToCountSql()
         {
             string fromClause = FromClause();
-            string sql = string.Format(@"SELECT COUNT(*) FROM {0}", fromClause);
+            string sql = $@"SELECT COUNT(*) FROM {fromClause}";
 
             string whereClause = BuildWhereClause(_oDataQueryOptions.Filter);
             if (!string.IsNullOrEmpty(whereClause))
             {
-                sql = string.Format("{0} WhERE {1}", sql, whereClause);
+                sql = $"{sql} WhERE {whereClause}";
             }
 
             return sql;

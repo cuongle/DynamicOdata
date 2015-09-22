@@ -26,7 +26,7 @@ namespace DynamicOdata.Service
 
         private string FromClause()
         {
-            return string.Format("[{0}].[{1}]", _edmEntityType.Namespace, _edmEntityType.Name);
+            return $"[{_edmEntityType.Namespace}].[{_edmEntityType.Name}]";
         }
 
         private string BuildWhereClause(FilterQueryOption filterQueryOption)

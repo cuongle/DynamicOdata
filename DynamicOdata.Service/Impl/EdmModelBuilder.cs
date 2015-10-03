@@ -8,7 +8,6 @@ using Microsoft.Data.Edm.Library;
 
 namespace DynamicOdata.Service.Impl
 {
-    
     public class EdmModelBuilder : IEdmModelBuilder
     {
         /// <summary>
@@ -28,7 +27,7 @@ namespace DynamicOdata.Service.Impl
             _databaseReader = new DatabaseReader(connectionString, "System.Data.SqlClient");
         }
 
-        private EdmStructuralProperty BuildProperty(EdmEntityType entity, DatabaseColumn column)
+        private static EdmStructuralProperty BuildProperty(EdmEntityType entity, DatabaseColumn column)
         {
             EdmPrimitiveTypeKind typeKind = EdmPrimitiveTypeKind.String;
 
@@ -82,7 +81,7 @@ namespace DynamicOdata.Service.Impl
             return entity.AddStructuralProperty(column.Name, typeKind, column.Nullable);
         }
 
-        private EdmEntityType BuildEdmEntityType(DatabaseTable table)
+        private static EdmEntityType BuildEdmEntityType(DatabaseTable table)
         {
             EdmEntityType entity = new EdmEntityType(table.SchemaOwner, table.Name);
 

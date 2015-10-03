@@ -29,7 +29,7 @@ namespace DynamicOdata.Web.Controllers
         {
             ODataPath path = Request.ODataProperties().Path;
             var collectionType = path.EdmType as IEdmCollectionType;
-            var entityType = collectionType.ElementType.Definition as IEdmEntityType;
+            var entityType = collectionType?.ElementType.Definition as IEdmEntityType;
 
             var dataProvider = GetDataService();
             var model = GetEdmModelBuilder().GetModel();

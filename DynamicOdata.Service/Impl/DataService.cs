@@ -84,10 +84,7 @@ namespace DynamicOdata.Service.Impl
             if (keys.Count != 1)
                 return null;
 
-            var sql = string.Format(@"SELECT * FROM [{0}].[{1}] WHERE [{2}] = @Key",
-                    entityType.Namespace,
-                    entityType.Name,
-                    keys.First().Name);
+            var sql = $@"SELECT * FROM [{entityType.Namespace}].[{entityType.Name}] WHERE [{keys.First().Name}] = @Key";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -112,14 +109,11 @@ namespace DynamicOdata.Service.Impl
                 if (!entity.TryGetPropertyValue(property.Name, out value))
                     continue;
 
-                var valueString = (value == null) ? "NULL" : string.Format("'{0}'", value);
+                var valueString = (value == null) ? "NULL" : $"'{value}'";
                 values.Add(valueString);
             }
 
-            var sql = string.Format(@"INSERT INTO [{0}].[{1}] VALUES ({2})",
-                    entityType.Namespace,
-                    entityType.Name,
-                    string.Join(",", values));
+            var sql = $@"INSERT INTO [{entityType.Namespace}].[{entityType.Name}] VALUES ({string.Join(",", values)})";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -144,17 +138,15 @@ namespace DynamicOdata.Service.Impl
                 if (!entity.TryGetPropertyValue(property.Name, out value))
                     continue;
 
-                var valueString = (value == null) ? "NULL" : string.Format("'{0}'", value);
-                string pairString = string.Format("{0}={1}", property.Name, valueString);
+                var valueString = (value == null) ? "NULL" : $"'{value}'";
+                string pairString = $"{property.Name}={valueString}";
 
                 valuePairs.Add(pairString);
             }
 
-            var sql = string.Format(@"UPDATE [{0}].[{1}] SET {2} WHERE [{3}] = @key",
-                   entityType.Namespace,
-                   entityType.Name,
-                   string.Join(",", valuePairs),
-                   keys.First().Name);
+            var sql =
+                $@"UPDATE [{entityType.Namespace}].[{entityType.Name}] SET {string.Join(",", valuePairs)} WHERE [{
+                    keys.First().Name}] = @key";
 
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -172,10 +164,8 @@ namespace DynamicOdata.Service.Impl
 
             using (var connection = new SqlConnection(_connectionString))
             {
-                var sql = string.Format(@"DELETE FROM [{0}].[{1}] WHERE [{2}] = @Key",
-                    entityType.Namespace,
-                    entityType.Name,
-                    keys.First().Name);
+                var sql =
+                    $@"DELETE FROM [{entityType.Namespace}].[{entityType.Name}] WHERE [{keys.First().Name}] = @Key";
 
                 connection.Execute(sql, new { Key = key });
             }

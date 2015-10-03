@@ -23,7 +23,7 @@ namespace DynamicOdata.Web.Routing
 
         public override IHttpVirtualPathData GetVirtualPath(HttpRequestMessage request, IDictionary<string, object> values)
         {
-            if (values == null || !values.Keys.Contains(HttpRoute.HttpRouteKey, StringComparer.OrdinalIgnoreCase))
+            if (values == null || !values.Keys.Contains(HttpRouteKey, StringComparer.OrdinalIgnoreCase))
             {
                 return null;
             }

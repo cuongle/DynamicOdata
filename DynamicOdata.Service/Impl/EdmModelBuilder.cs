@@ -10,20 +10,11 @@ namespace DynamicOdata.Service.Impl
 {
     public class EdmModelBuilder : IEdmModelBuilder
     {
-        /// <summary>
-        /// Cache model to boost performance
-        /// </summary>
-        private static readonly IDictionary<string, EdmModel> ModelMap = new Dictionary<string, EdmModel>();
-
-        private readonly string _clientName;
-
         private readonly IDatabaseReader _databaseReader;
 
         public EdmModelBuilder(string clientName)
         {
-            _clientName = clientName;
-
-            var connectionString = ConfigurationManager.ConnectionStrings[_clientName].ConnectionString;
+            var connectionString = ConfigurationManager.ConnectionStrings[clientName].ConnectionString;
             _databaseReader = new DatabaseReader(connectionString, "System.Data.SqlClient");
         }
 
@@ -97,19 +88,6 @@ namespace DynamicOdata.Service.Impl
         }
 
         public EdmModel GetModel()
-        {
-            EdmModel model;
-
-            if (!ModelMap.TryGetValue(_clientName, out model))
-            {
-                model = DoGetModel();
-                ModelMap.Add(_clientName, model);
-            }
-
-            return model;
-        }
-
-        private EdmModel DoGetModel()
         {
             EdmModel model = new EdmModel();
             EdmEntityContainer container = new EdmEntityContainer("ns", "container");

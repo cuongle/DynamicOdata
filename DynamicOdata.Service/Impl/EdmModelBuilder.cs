@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using DatabaseSchemaReader;
-using DatabaseSchemaReader.DataSchema;
+using DynamicOdata.Service.Models;
 using Microsoft.Data.Edm;
 using Microsoft.Data.Edm.Library;
 
@@ -10,71 +9,69 @@ namespace DynamicOdata.Service.Impl
 {
     public class EdmModelBuilder : IEdmModelBuilder
     {
-        private readonly IDatabaseReader _databaseReader;
+        private readonly ISchemaReader _schemaReader;
+        private readonly string _connectionString;
 
-        public EdmModelBuilder(string clientName)
+        public EdmModelBuilder(string clientName, ISchemaReader schemaReader)
         {
-            var connectionString = ConfigurationManager.ConnectionStrings[clientName].ConnectionString;
-            _databaseReader = new DatabaseReader(connectionString, "System.Data.SqlClient");
+            _connectionString = ConfigurationManager.ConnectionStrings[clientName].ConnectionString;
+            _schemaReader = schemaReader;
+        }
+
+        private static IDictionary<string, EdmPrimitiveTypeKind> BuildEdmTypeMap()
+        {
+            var map = new Dictionary<string, EdmPrimitiveTypeKind>
+            {
+                {"tinyint", EdmPrimitiveTypeKind.Byte},
+                {"smallint", EdmPrimitiveTypeKind.Int16},
+                {"int", EdmPrimitiveTypeKind.Int32},
+                {"bigint", EdmPrimitiveTypeKind.Int64},
+                {"float", EdmPrimitiveTypeKind.Double},
+                {"real", EdmPrimitiveTypeKind.Single},
+                {"uniqueidentifier", EdmPrimitiveTypeKind.Guid},
+                {"geography", EdmPrimitiveTypeKind.Geography},
+                {"bit", EdmPrimitiveTypeKind.Boolean},
+                {"binary", EdmPrimitiveTypeKind.Binary}
+            };
+
+            var stringTypes = new[] { "char", "nchar", "varchar", "nvarchar", "text", "ntext" }
+                .ToDictionary(s => s, _ => EdmPrimitiveTypeKind.String);
+
+            var decimalTypes = new[] { "decimal", "numeric", "money", "smallmoney" }
+                .ToDictionary(s => s, _ => EdmPrimitiveTypeKind.Decimal);
+
+            var dateTimeTypes = new[] { "datetime", "smalldatetime", "date" }
+                .ToDictionary(s => s, _ => EdmPrimitiveTypeKind.DateTime);
+
+            var timeStampTypes = new[] { "time", "timestamp" }
+                .ToDictionary(s => s, _ => EdmPrimitiveTypeKind.DateTimeOffset);
+
+            map = map.Concat(stringTypes)
+                .Concat(decimalTypes)
+                .Concat(dateTimeTypes)
+                .Concat(timeStampTypes)
+                .ToDictionary(x => x.Key, x => x.Value);
+
+            return map;
         }
 
         private static EdmStructuralProperty BuildProperty(EdmEntityType entity, DatabaseColumn column)
         {
-            EdmPrimitiveTypeKind typeKind = EdmPrimitiveTypeKind.String;
+            var typeKind = EdmPrimitiveTypeKind.String;
+            var typeMap = BuildEdmTypeMap();
 
-            var stringTypes = new[] { "char", "nchar", "varchar", "nvarchar", "text", "ntext" };
-            if (stringTypes.Contains(column.DbDataType))
-                typeKind = EdmPrimitiveTypeKind.String;
-
-            if (column.DbDataType == "tinyint")
-                typeKind = EdmPrimitiveTypeKind.Byte;
-
-            if (column.DbDataType == "smallint")
-                typeKind = EdmPrimitiveTypeKind.Int16;
-
-            if (column.DbDataType == "int")
-                typeKind = EdmPrimitiveTypeKind.Int32;
-
-            if (column.DbDataType == "bigint")
-                typeKind = EdmPrimitiveTypeKind.Int64;
-
-            if (column.DbDataType == "float")
-                typeKind = EdmPrimitiveTypeKind.Double;
-
-            if (column.DbDataType == "real")
-                typeKind = EdmPrimitiveTypeKind.Single;
-
-            var decimalTypes = new[] { "decimal", "numeric", "money", "smallmoney" };
-            if (decimalTypes.Contains(column.DbDataType))
-                typeKind = EdmPrimitiveTypeKind.Decimal;
-
-            if (column.DbDataType == "datetime" || column.DbDataType == "smalldatetime" || column.DbDataType == "date")
-                typeKind = EdmPrimitiveTypeKind.DateTime;
-
-            if (column.DbDataType == "time")
-                typeKind = EdmPrimitiveTypeKind.DateTimeOffset;
-
-            if (column.DbDataType == "timestamp")
-                typeKind = EdmPrimitiveTypeKind.DateTimeOffset;
-
-            if (column.DbDataType == "uniqueidentifier")
-                typeKind = EdmPrimitiveTypeKind.Guid;
-
-            if (column.DbDataType == "geography")
-                typeKind = EdmPrimitiveTypeKind.Geography;
-
-            if (column.DbDataType == "bit")
-                typeKind = EdmPrimitiveTypeKind.Boolean;
-
-            if (column.DbDataType == "binary")
-                typeKind = EdmPrimitiveTypeKind.Binary;
+            if (typeMap.ContainsKey(column.DataType))
+            {
+                typeKind = typeMap[column.DataType];
+            }
 
             return entity.AddStructuralProperty(column.Name, typeKind, column.Nullable);
         }
 
+
         private static EdmEntityType BuildEdmEntityType(DatabaseTable table)
         {
-            EdmEntityType entity = new EdmEntityType(table.SchemaOwner, table.Name);
+            EdmEntityType entity = new EdmEntityType(table.Schema, table.Name);
 
             foreach (var column in table.Columns)
             {
@@ -93,15 +90,15 @@ namespace DynamicOdata.Service.Impl
             EdmEntityContainer container = new EdmEntityContainer("ns", "container");
             model.AddElement(container);
 
-            var schema = _databaseReader.ReadAll();
+            var databaseTables = _schemaReader.GetTables(null);
 
-            foreach (var table in schema.Tables)
+            foreach (var table in databaseTables)
             {
-                var entity = BuildEdmEntityType(table);
-                model.AddElement(entity);
+                var entityType = BuildEdmEntityType(table);
+                string setName = table.Name.Replace(" ", string.Empty);
 
-                var entitySetName = entity.Name.Replace(" ", ""); // entity set's name should not have space inside 
-                container.AddEntitySet(entitySetName, entity);
+                model.AddElement(entityType);
+                container.AddEntitySet(setName, entityType);
             }
 
             return model;

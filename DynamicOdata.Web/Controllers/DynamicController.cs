@@ -22,7 +22,7 @@ namespace DynamicOdata.Web.Controllers
         private IEdmModelBuilder GetEdmModelBuilder()
         {
             var sourceName = Request.Properties[Constants.ODataDataSource] as string;
-            return new EdmModelBuilder(sourceName);
+            return new EdmModelBuilder(sourceName, new SchemaReader(sourceName));
         }
 
         public EdmEntityObjectCollection Get()

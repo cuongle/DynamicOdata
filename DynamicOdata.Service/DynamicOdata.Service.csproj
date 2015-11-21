@@ -34,10 +34,6 @@
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DatabaseSchemaReader, Version=1.4.0.32, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DatabaseSchemaReader.1.4.0.32\lib\net40\DatabaseSchemaReader.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.6.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Edm.5.6.4\lib\net40\Microsoft.Data.Edm.dll</HintPath>
       <Private>True</Private>
@@ -81,6 +77,11 @@
     <Compile Include="Impl\EdmModelBuilder.cs" />
     <Compile Include="IDataService.cs" />
     <Compile Include="IEdmModelBuilder.cs" />
+    <Compile Include="Impl\SchemaReader.cs" />
+    <Compile Include="ISchemaReader.cs" />
+    <Compile Include="Models\DatabaseColumn.cs" />
+    <Compile Include="Models\DatabaseTable.cs" />
+    <Compile Include="Models\TableInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlQueryBuilder.cs" />
   </ItemGroup>

@@ -16,14 +16,25 @@ namespace DynamicOdata.Web.Routing
         private readonly bool _canGenerateDirectLink;
 
         public CustomODataRoute(string routePrefix, ODataPathRouteConstraint pathConstraint)
-            : base(routePrefix, pathConstraint)
+            : this(routePrefix, pathConstraint, defaults: null, constraints: null, dataTokens: null, handler: null)
+        {
+        }
+
+        public CustomODataRoute(
+            string routePrefix,
+            ODataPathRouteConstraint pathConstraint,
+            HttpRouteValueDictionary defaults,
+            HttpRouteValueDictionary constraints,
+            HttpRouteValueDictionary dataTokens,
+            HttpMessageHandler handler)
+            : base(routePrefix, pathConstraint, defaults, constraints, dataTokens, handler)
         {
             _canGenerateDirectLink = routePrefix != null && RoutePrefix.IndexOf('{') == -1;
         }
 
         public override IHttpVirtualPathData GetVirtualPath(HttpRequestMessage request, IDictionary<string, object> values)
         {
-            if (values == null || !values.Keys.Contains(HttpRouteKey, StringComparer.OrdinalIgnoreCase))
+            if (values == null || !values.Keys.Contains(HttpRoute.HttpRouteKey, StringComparer.OrdinalIgnoreCase))
             {
                 return null;
             }
@@ -49,22 +60,23 @@ namespace DynamicOdata.Web.Routing
             if (configuration == null || !_canGenerateDirectLink)
                 return null;
 
-            string dataSource = request.Properties[Constants.ODataDataSource] as string;
-            string link = CombinePathSegments(RoutePrefix, dataSource, odataPath);
+            string odataEndpoint = request.Properties[Constants.ODataEndpoint] as string;
+            string link = CombinePathSegments(RoutePrefix, odataEndpoint, odataPath);
+
             link = UriEncode(link);
 
             return new HttpVirtualPathData(this, link);
         }
 
-        private static string CombinePathSegments(string routePrefix, string dataSource, string odataPath)
+        private static string CombinePathSegments(string routePrefix, string odataEndpoint, string odataPath)
         {
             string link = string.Empty;
 
             if (!string.IsNullOrEmpty(routePrefix))
                 link += routePrefix + "/";
 
-            if (!string.IsNullOrEmpty(dataSource))
-                link += dataSource + "/";
+            if (!string.IsNullOrEmpty(odataEndpoint))
+                link += odataEndpoint + "/";
 
             if (!string.IsNullOrEmpty(odataPath))
                 link += odataPath;

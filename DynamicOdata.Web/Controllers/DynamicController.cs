@@ -15,13 +15,13 @@ namespace DynamicOdata.Web.Controllers
     {
         private IDataService GetDataService()
         {
-            var sourceName = Request.Properties[Constants.ODataDataSource] as string;
+            var sourceName = Request.Properties[Constants.ODataEndpoint] as string;
             return new DataService(sourceName);
         }
 
         private IEdmModelBuilder GetEdmModelBuilder()
         {
-            var sourceName = Request.Properties[Constants.ODataDataSource] as string;
+            var sourceName = Request.Properties[Constants.ODataEndpoint] as string;
             return new EdmModelBuilder(new SchemaReader(sourceName));
         }
 

@@ -9,7 +9,6 @@ using System.Web.Http.OData.Routing.Conventions;
 using System.Web.Http.Routing;
 using Microsoft.Data.Edm;
 using Microsoft.Data.Edm.Library;
-using Microsoft.Data.OData;
 
 namespace DynamicOdata.Web.Routing
 {
@@ -67,7 +66,7 @@ namespace DynamicOdata.Web.Routing
                 string oDataPathAndQuery = requestLeftPart.Substring(serviceRoot.Length);
                 path = PathHandler.Parse(model, oDataPathAndQuery);
             }
-            catch (ODataException)
+            catch (Exception ex)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
@@ -100,64 +99,43 @@ namespace DynamicOdata.Web.Routing
 
         private static string RemoveODataPath(string uriString, string oDataPathString)
         {
-            // Potential index of oDataPathString within uriString.
             int endIndex = uriString.Length - oDataPathString.Length - 1;
             if (endIndex <= 0)
-            {
-                // Bizarre: oDataPathString is longer than uriString.  Likely the values collection passed to Match()
-                // is corrupt.
-                throw new InvalidOperationException(
-                    $"Request Uri Is Too Short For ODataPath. the Uri is {uriString}, and the OData path is {oDataPathString}.");
-            }
+                throw new InvalidOperationException($"Request Uri Is Too Short For ODataPath. the Uri is {uriString}, and the OData path is {oDataPathString}.");
 
             string startString = uriString.Substring(0, endIndex + 1);  // Potential return value.
             string endString = uriString.Substring(endIndex + 1);       // Potential oDataPathString match.
+
             if (string.Equals(endString, oDataPathString, StringComparison.Ordinal))
-            {
-                // Simple case, no escaping in the ODataPathString portion of the Path.  In this case, don't do extra
-                // work to look for trailing '/' in startString.
                 return startString;
-            }
 
             while (true)
             {
-                // Escaped '/' is a derivative case but certainly possible.
                 int slashIndex = startString.LastIndexOf('/', endIndex - 1);
-                int escapedSlashIndex =
-                    startString.LastIndexOf(EscapedSlash, endIndex - 1, StringComparison.OrdinalIgnoreCase);
+                int escapedSlashIndex = startString.LastIndexOf(EscapedSlash, endIndex - 1, StringComparison.OrdinalIgnoreCase);
+
                 if (slashIndex > escapedSlashIndex)
                 {
                     endIndex = slashIndex;
                 }
                 else if (escapedSlashIndex >= 0)
                 {
-                    // Include the escaped '/' (three characters) in the potential return value.
                     endIndex = escapedSlashIndex + 2;
                 }
                 else
                 {
-                    // Failure, unable to find the expected '/' or escaped '/' separator.
-                    throw new InvalidOperationException(
-                        $"The OData path is not found. The Uri is {uriString}, and the OData path is {oDataPathString}.");
+                    throw new InvalidOperationException($"The OData path is not found. The Uri is {uriString}, and the OData path is {oDataPathString}.");
                 }
 
                 startString = uriString.Substring(0, endIndex + 1);
                 endString = uriString.Substring(endIndex + 1);
 
-                // Compare unescaped strings to avoid both arbitrary escaping and use of lowercase 'a' through 'f' in
-                // %-escape sequences.
                 endString = Uri.UnescapeDataString(endString);
                 if (string.Equals(endString, oDataPathString, StringComparison.Ordinal))
-                {
                     return startString;
-                }
 
                 if (endIndex == 0)
-                {
-                    // Failure, could not match oDataPathString after an initial '/' or escaped '/'.
-                    throw new InvalidOperationException(
-                        $"The OData path is not found. The Uri is {uriString}, and the OData path is {oDataPathString}.");
-                }
+                    throw new InvalidOperationException($"The OData path is not found. The Uri is {uriString}, and the OData path is {oDataPathString}.");
             }
         }
     }

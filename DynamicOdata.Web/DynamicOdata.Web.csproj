@@ -104,16 +104,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Routing\Constants.cs" />
     <Compile Include="Controllers\DynamicController.cs" />
-    <Compile Include="Routing\CustomODataPathRouteConstraint.cs" />
-    <Compile Include="Routing\CustomODataRoute.cs" />
-    <Compile Include="Routing\DynamicModelHelper.cs" />
+    <Compile Include="Controllers\DynamicOdataMetaDataController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Routing\DynamicRoutingConvention.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Routing\Constants.cs" />
+    <Compile Include="Routing\CustomODataPathRouteConstraint.cs" />
+    <Compile Include="Routing\CustomODataRoute.cs" />
+    <Compile Include="Routing\DynamicModelHelper.cs" />
+    <Compile Include="Routing\DynamicRoutingConvention.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

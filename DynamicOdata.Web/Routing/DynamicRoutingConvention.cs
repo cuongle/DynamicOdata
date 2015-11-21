@@ -18,7 +18,7 @@ namespace DynamicOdata.Web.Routing
             if (odataPath.Segments.FirstOrDefault() is EntitySetPathSegment)
                 return "Dynamic";
 
-            return null;
+            return "DynamicOdataMetadata";
         }
     }
 }

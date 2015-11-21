@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Http.OData.Batch;
 using System.Web.Http.OData.Routing;
 using System.Web.Http.OData.Routing.Conventions;
-using DynamicOdata.Service;
 using DynamicOdata.Service.Impl;
 using Microsoft.Data.Edm;
 
@@ -13,18 +10,7 @@ namespace DynamicOdata.Web.Routing
 {
     public static class DynamicModelHelper
     {
-        public static ODataRoute CustomMapODataServiceRoute(HttpRouteCollection routes, string routeName, string routePrefix)
-        {
-            IList<IODataRoutingConvention> routingConventions = ODataRoutingConventions.CreateDefault();
-            routingConventions.Insert(0, new DynamicRoutingConvention());
-
-            return CustomMapODataServiceRoute(routes, routeName, routePrefix, GetModelFuncFromRequest(),
-                new DefaultODataPathHandler(), routingConventions);
-        }
-
-        private static ODataRoute CustomMapODataServiceRoute(HttpRouteCollection routes, string routeName, string routePrefix,
-            Func<HttpRequestMessage, IEdmModel> modelProvider, IODataPathHandler pathHandler,
-            IEnumerable<IODataRoutingConvention> routingConventions, ODataBatchHandler batchHandler = null)
+        public static ODataRoute CustomMapODataServiceRoute(HttpRouteCollection routes, string routeName, string routePrefix, HttpMessageHandler handler = null)
         {
             if (!string.IsNullOrEmpty(routePrefix))
             {
@@ -35,19 +21,22 @@ namespace DynamicOdata.Web.Routing
                 }
             }
 
-            if (batchHandler != null)
-            {
-                batchHandler.ODataRouteName = routeName;
+            var pathHandler = new DefaultODataPathHandler();
 
-                string batchTemplate = string.IsNullOrEmpty(routePrefix)
-                    ? ODataRouteConstants.Batch
-                    : routePrefix + '/' + ODataRouteConstants.Batch;
+            var routingConventions = ODataRoutingConventions.CreateDefault();
+            routingConventions.Insert(0, new DynamicRoutingConvention());
 
-                routes.MapHttpBatchRoute(routeName + "Batch", batchTemplate, batchHandler);
-            }
+            var modelProvider = GetModelFuncFromRequest();
 
             var routeConstraint = new CustomODataPathRouteConstraint(pathHandler, modelProvider, routeName, routingConventions);
-            var odataRoute = new CustomODataRoute(routePrefix, routeConstraint);
+
+            var odataRoute = new CustomODataRoute(
+                routePrefix: routePrefix,
+                pathConstraint: routeConstraint,
+                defaults: null,
+                constraints: null,
+                dataTokens: null,
+                handler: handler);
 
             routes.Add(routeName, odataRoute);
 
@@ -60,14 +49,14 @@ namespace DynamicOdata.Web.Routing
             {
                 string odataPath = request.Properties[Constants.CustomODataPath] as string ?? string.Empty;
                 string[] segments = odataPath.Split('/');
-                string dataSource = segments[0];
+                string odataEndpoint = segments[0];
 
-                IEdmModelBuilder modelBuilder = new EdmModelBuilder(new SchemaReader(dataSource));
-                IEdmModel model = modelBuilder.GetModel();
-
-                request.Properties[Constants.ODataDataSource] = dataSource;
+                request.Properties[Constants.ODataEndpoint] = odataEndpoint;
                 request.Properties[Constants.CustomODataPath] = string.Join("/", segments, 1, segments.Length - 1);
 
+                var modelBuilder = new EdmModelBuilder(new SchemaReader(odataEndpoint));
+                IEdmModel model = modelBuilder.GetModel();
+                
                 return model;
             };
         }

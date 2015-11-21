@@ -45,7 +45,7 @@ namespace DynamicOdata.Service.Impl
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    var sqlBuilder = new SqlQueryBuilder(entityType, queryOptions);
+                    var sqlBuilder = new SqlQueryBuilder(queryOptions);
                     count = connection.Query<int>(sqlBuilder.ToCountSql()).Single();
                 }
             }
@@ -53,7 +53,7 @@ namespace DynamicOdata.Service.Impl
             return count;
         }
 
-        public EdmEntityObjectCollection Get(IEdmCollectionType collectionType, ODataQueryOptions oDataQueryOptions)
+        public EdmEntityObjectCollection Get(IEdmCollectionType collectionType, ODataQueryOptions queryOptions)
         {
             var entityType = collectionType.ElementType.Definition as EdmEntityType;
             var collection = new EdmEntityObjectCollection(new EdmCollectionTypeReference(collectionType, true));
@@ -62,7 +62,7 @@ namespace DynamicOdata.Service.Impl
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    var sqlBuilder = new SqlQueryBuilder(entityType, oDataQueryOptions);
+                    var sqlBuilder = new SqlQueryBuilder(queryOptions);
                     IEnumerable<dynamic> rows = connection.Query<dynamic>(sqlBuilder.ToSql());
 
                     foreach (dynamic row in rows)

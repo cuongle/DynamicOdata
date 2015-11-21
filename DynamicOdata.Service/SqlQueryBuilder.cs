@@ -7,13 +7,13 @@ namespace DynamicOdata.Service
 {
     public class SqlQueryBuilder
     {
-        private readonly ODataQueryOptions _oDataQueryOptions;
+        private readonly ODataQueryOptions _queryOptions;
         private readonly EdmEntityType _edmEntityType;
 
-        public SqlQueryBuilder(EdmEntityType edmEntityType, ODataQueryOptions oDataQueryOptions)
+        public SqlQueryBuilder(ODataQueryOptions queryOptions)
         {
-            _oDataQueryOptions = oDataQueryOptions;
-            _edmEntityType = edmEntityType;
+            _queryOptions = queryOptions;
+            _edmEntityType = queryOptions.Context.ElementType as EdmEntityType;
         }
 
         private string BuildSelectClause(SelectExpandQueryOption selectExpandQueryOption)
@@ -115,17 +115,17 @@ namespace DynamicOdata.Service
         public string ToSql()
         {
             string fromClause = FromClause();
-            string selectClause = BuildSelectClause(_oDataQueryOptions.SelectExpand);
+            string selectClause = BuildSelectClause(_queryOptions.SelectExpand);
 
             string sql = $@"SELECT {selectClause} FROM {fromClause}";
 
-            string whereClause = BuildWhereClause(_oDataQueryOptions.Filter);
+            string whereClause = BuildWhereClause(_queryOptions.Filter);
             if (!string.IsNullOrEmpty(whereClause))
             {
                 sql = $"{sql} WhERE {whereClause}";
             }
 
-            string orderClause = BuildOrderClause(_oDataQueryOptions.OrderBy, _oDataQueryOptions.Top, _oDataQueryOptions.Skip);
+            string orderClause = BuildOrderClause(_queryOptions.OrderBy, _queryOptions.Top, _queryOptions.Skip);
             if (!string.IsNullOrEmpty(orderClause))
             {
                 sql = $"{sql} ORDER BY {orderClause}";
@@ -139,7 +139,7 @@ namespace DynamicOdata.Service
             string fromClause = FromClause();
             string sql = $@"SELECT COUNT(*) FROM {fromClause}";
 
-            string whereClause = BuildWhereClause(_oDataQueryOptions.Filter);
+            string whereClause = BuildWhereClause(_queryOptions.Filter);
             if (!string.IsNullOrEmpty(whereClause))
             {
                 sql = $"{sql} WhERE {whereClause}";

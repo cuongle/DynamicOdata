@@ -5,24 +5,19 @@ using System.Web.Http.OData.Extensions;
 using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
 using DynamicOdata.Service;
-using DynamicOdata.Service.Impl;
-using DynamicOdata.Web.Routing;
 using Microsoft.Data.Edm;
 
 namespace DynamicOdata.Web.Controllers
 {
     public class DynamicController : ODataController
     {
-        private IDataService GetDataService()
-        {
-            var odataEndpoint = Request.Properties[Constants.ODataEndpoint] as string;
-            return new DataService(odataEndpoint);
-        }
+        private readonly IDataService _dataService;
+        private readonly IEdmModelBuilder _edmModelBuilder;
 
-        private IEdmModelBuilder GetEdmModelBuilder()
+        public DynamicController(IDataService dataService, IEdmModelBuilder edmModelBuilder)
         {
-            var odataEndpoint = Request.Properties[Constants.ODataEndpoint] as string;
-            return new EdmModelBuilder(new SchemaReader(odataEndpoint));
+            _dataService = dataService;
+            _edmModelBuilder = edmModelBuilder;
         }
 
         public EdmEntityObjectCollection Get()
@@ -31,8 +26,7 @@ namespace DynamicOdata.Web.Controllers
             var collectionType = path.EdmType as IEdmCollectionType;
             var entityType = collectionType?.ElementType.Definition as IEdmEntityType;
 
-            var dataProvider = GetDataService();
-            var model = GetEdmModelBuilder().GetModel();
+            var model = _edmModelBuilder.GetModel();
 
             var queryContext = new ODataQueryContext(model, entityType);
             var queryOptions = new ODataQueryOptions(queryContext, Request);
@@ -41,7 +35,7 @@ namespace DynamicOdata.Web.Controllers
             var oDataProperties = Request.ODataProperties();
             if (queryOptions.InlineCount != null)
             {
-                oDataProperties.TotalCount = dataProvider.Count(collectionType, queryOptions);
+                oDataProperties.TotalCount = _dataService.Count(collectionType, queryOptions);
             }
 
             //make $select works
@@ -50,7 +44,7 @@ namespace DynamicOdata.Web.Controllers
                 oDataProperties.SelectExpandClause = queryOptions.SelectExpand.SelectExpandClause;
             }
 
-            var collection = dataProvider.Get(collectionType, queryOptions);
+            var collection = _dataService.Get(collectionType, queryOptions);
 
             return collection;
         }
@@ -60,8 +54,7 @@ namespace DynamicOdata.Web.Controllers
             ODataPath path = Request.ODataProperties().Path;
             IEdmEntityType entityType = path.EdmType as IEdmEntityType;
 
-            var dataProvider = GetDataService();
-            var entity = dataProvider.Get(key, entityType);
+            var entity = _dataService.Get(key, entityType);
 
             // make sure return 404 if key does not exist in database
             if (entity == null)

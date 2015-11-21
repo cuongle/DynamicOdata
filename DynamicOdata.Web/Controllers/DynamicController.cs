@@ -69,36 +69,5 @@ namespace DynamicOdata.Web.Controllers
 
             return entity;
         }
-
-        public IEdmEntityObject Post(IEdmEntityObject entity)
-        {
-            var entityType = entity.GetEdmType().Definition as IEdmEntityType;
-
-            var dataProvider = GetDataService();
-            dataProvider.Insert(entityType, entity);
-
-            return entity;
-        }
-
-        public IHttpActionResult Delete(string key)
-        {
-            ODataPath path = Request.ODataProperties().Path;
-            IEdmEntityType entityType = path.EdmType as IEdmEntityType;
-
-            var dataProvider = GetDataService();
-            dataProvider.Delete(entityType, key);
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        public IHttpActionResult Put(string key, IEdmEntityObject entity)
-        {
-            var entityType = entity.GetEdmType().Definition as IEdmEntityType;
-
-            var dataProvider = GetDataService();
-            dataProvider.Update(entityType, entity, key);
-
-            return Updated(entity);
-        }
     }
 }

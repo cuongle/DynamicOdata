@@ -10,12 +10,6 @@ namespace DynamicOdata.Service
 
         EdmEntityObject Get(string key, IEdmEntityType entityType);
 
-        void Insert(IEdmEntityType entityType, IEdmEntityObject entity);
-
-        void Update(IEdmEntityType entityType, IEdmEntityObject entity, string key);
-
-        void Delete(IEdmEntityType entityType, string key);
-
         int Count(IEdmCollectionType collectionType, ODataQueryOptions queryOptions);
     }
 }

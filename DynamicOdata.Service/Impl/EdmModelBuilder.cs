@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using DynamicOdata.Service.Models;
 using Microsoft.Data.Edm;

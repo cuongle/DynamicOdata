@@ -10,11 +10,9 @@ namespace DynamicOdata.Service.Impl
     public class EdmModelBuilder : IEdmModelBuilder
     {
         private readonly ISchemaReader _schemaReader;
-        private readonly string _connectionString;
 
-        public EdmModelBuilder(string clientName, ISchemaReader schemaReader)
+        public EdmModelBuilder(ISchemaReader schemaReader)
         {
-            _connectionString = ConfigurationManager.ConnectionStrings[clientName].ConnectionString;
             _schemaReader = schemaReader;
         }
 

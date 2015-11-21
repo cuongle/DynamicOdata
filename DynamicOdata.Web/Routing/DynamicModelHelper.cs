@@ -62,7 +62,7 @@ namespace DynamicOdata.Web.Routing
                 string[] segments = odataPath.Split('/');
                 string dataSource = segments[0];
 
-                IEdmModelBuilder modelBuilder = new EdmModelBuilder(dataSource, new SchemaReader(dataSource));
+                IEdmModelBuilder modelBuilder = new EdmModelBuilder(new SchemaReader(dataSource));
                 IEdmModel model = modelBuilder.GetModel();
 
                 request.Properties[Constants.ODataDataSource] = dataSource;

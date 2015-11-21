@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Web.Http.OData.Query;
 using Microsoft.Data.Edm.Library;
+using Microsoft.Data.OData.Query;
+using Microsoft.Data.OData.Query.SemanticAst;
 
 namespace DynamicOdata.Service
 {
@@ -16,12 +17,16 @@ namespace DynamicOdata.Service
             _edmEntityType = queryOptions.Context.ElementType as EdmEntityType;
         }
 
-        private string BuildSelectClause(SelectExpandQueryOption selectExpandQueryOption)
+        private static string BuildSelectClause(SelectExpandQueryOption selectExpandQueryOption)
         {
             if (selectExpandQueryOption == null)
                 return "*"; // Select All
 
-            return selectExpandQueryOption.RawSelect;
+            var columns = selectExpandQueryOption.RawSelect.Split(',').AsEnumerable();
+
+            string selectClause = string.Join(",", columns);
+
+            return selectClause;
         }
 
         private string FromClause()
@@ -29,24 +34,114 @@ namespace DynamicOdata.Service
             return $"[{_edmEntityType.Namespace}].[{_edmEntityType.Name}]";
         }
 
+        private string BuildSingleClause(SingleValuePropertyAccessNode propertyNode, ConstantNode valueNode, BinaryOperatorKind operatorKind)
+        {
+            string operatorString = string.Empty;
+
+            switch (operatorKind)
+            {
+                case BinaryOperatorKind.Equal:
+                    operatorString = "=";
+                    break;
+
+                case BinaryOperatorKind.NotEqual:
+                    operatorString = "!=";
+                    break;
+
+                case BinaryOperatorKind.GreaterThan:
+                    operatorString = ">";
+                    break;
+
+                case BinaryOperatorKind.GreaterThanOrEqual:
+                    operatorString = ">=";
+                    break;
+
+                case BinaryOperatorKind.LessThan:
+                    operatorString = "<";
+                    break;
+
+                case BinaryOperatorKind.LessThanOrEqual:
+                    operatorString = "<=";
+                    break;
+            }
+
+            string valueString = valueNode.Value?.ToString() ?? "null";
+
+            if (valueNode.Value == null)
+            {
+                if (operatorKind == BinaryOperatorKind.Equal)
+                    return $"({propertyNode.Property.Name} IS NULL)";
+
+                if (operatorKind == BinaryOperatorKind.NotEqual)
+                    return $"({propertyNode.Property.Name} IS NOT NULL)";
+            }
+
+            return $"({propertyNode.Property.Name} {operatorString} {valueString})";
+        }
+
+        private string BuildFromPropertyNode(SingleValuePropertyAccessNode left, SingleValueNode right, BinaryOperatorKind operatorKind)
+        {
+            string result = string.Empty;
+            if (right is ConstantNode)
+            {
+                result = BuildSingleClause(left, right as ConstantNode, operatorKind);
+            }
+
+            var rightSource = (right as ConvertNode)?.Source;
+            if (rightSource is ConstantNode)
+            {
+                result = BuildSingleClause(left, rightSource as ConstantNode, operatorKind);
+            }
+
+            return result;
+        }
+
+        private string BuildWhereClause(SingleValueNode node)
+        {
+            string result = string.Empty;
+
+            var operatorNode = node as BinaryOperatorNode;
+            if (operatorNode == null)
+                return result;
+
+            var left = operatorNode.Left;
+            var right = operatorNode.Right;
+
+            if (left is SingleValuePropertyAccessNode)
+                return BuildFromPropertyNode(left as SingleValuePropertyAccessNode, right, operatorNode.OperatorKind);
+
+            if (left is ConvertNode)
+            {
+                var leftSource = ((ConvertNode)left).Source;
+
+                if (leftSource is SingleValuePropertyAccessNode)
+                    return BuildFromPropertyNode(leftSource as SingleValuePropertyAccessNode, right, operatorNode.OperatorKind);
+
+                result += BuildWhereClause(leftSource);
+            }
+
+            if (left is BinaryOperatorNode)
+            {
+                result += BuildWhereClause(left);
+            }
+
+            result += " " + operatorNode.OperatorKind;
+
+            if (right is BinaryOperatorNode)
+            {
+                result += " " + BuildWhereClause(right);
+            }
+
+            return result;
+        }
+
         private string BuildWhereClause(FilterQueryOption filterQueryOption)
         {
-            if (filterQueryOption == null) return null;
+            if (filterQueryOption == null)
+                return string.Empty;
 
-            var operatorMap = new Dictionary<string, string>
-            {
-                {"eq", "="},
-                {"ne", "!="},
-                {"gt", ">"},
-                {"ge", ">="},
-                {"lt", "<"},
-                {"le", "<="}
-            };
-
-            string odataClause = operatorMap.Aggregate(filterQueryOption.RawValue,
-                (current, pair) => current.Replace(pair.Key, pair.Value));
-
-            return odataClause;
+            var whereClause = BuildWhereClause(filterQueryOption.FilterClause.Expression);
+            return whereClause;
         }
 
         private bool HasDeclareKey()
@@ -63,7 +158,8 @@ namespace DynamicOdata.Service
 
             if (orderByQueryOption != null)
             {
-                orderClause = orderByQueryOption.RawValue;
+                var columns = orderByQueryOption.RawValue.Split(',').AsEnumerable();
+                orderClause = string.Join(",", columns);
             }
             else
             {
@@ -122,7 +218,7 @@ namespace DynamicOdata.Service
             string whereClause = BuildWhereClause(_queryOptions.Filter);
             if (!string.IsNullOrEmpty(whereClause))
             {
-                sql = $"{sql} WhERE {whereClause}";
+                sql = $"{sql} WHERE {whereClause}";
             }
 
             string orderClause = BuildOrderClause(_queryOptions.OrderBy, _queryOptions.Top, _queryOptions.Skip);
@@ -142,7 +238,7 @@ namespace DynamicOdata.Service
             string whereClause = BuildWhereClause(_queryOptions.Filter);
             if (!string.IsNullOrEmpty(whereClause))
             {
-                sql = $"{sql} WhERE {whereClause}";
+                sql = $"{sql} WHERE {whereClause}";
             }
 
             return sql;

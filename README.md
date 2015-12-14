@@ -6,7 +6,7 @@ Dynamic ODATA is ODATA service which dynamically get your data in any database t
 
 The purpose is to make ODATA API is simple to use, if you want to get data from [Adventure](http://msftdbprodsamples.codeplex.com/releases), just provide and add the connection string into web.config:
 
-     <add name="adventure" connectionString="data source=.\SQLEXPRESS;initial catalog=AdventureWorks2014;User ID={username};Password={password};"/>
+    <add name="adventure" connectionString="data source=.\SQLEXPRESS;initial catalog=AdventureWorks2014;User ID={username};Password={password};"/>
 
 Then ODATA service will be available at: 
 

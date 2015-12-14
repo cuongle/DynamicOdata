@@ -16,4 +16,4 @@ Under the hood, this library is built based on two points:
 
 1. Build EDM model dynamically for per request. This step might be heavy if you have database which has lots of tables, in that case you can consider to use cache for EDM model per database.
 
-2. Convert ODATA query to SQL directly. This implementation just support some basic ODATA queries: $top, $select, $order, $filter, $skip.
+2. Convert ODATA query to SQL directly. This implementation just support some basic ODATA queries: `$top`,`$select`, `$order`, `$filter`, `$skip`.

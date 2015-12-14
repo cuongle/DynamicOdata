@@ -14,5 +14,6 @@ Then ODATA service will be available at:
     
 Under the hood, this library is built based on two points:
 
-1. Build EDM model dynamically for per request.
-2. Convert ODATA query to SQL directly. This implementation just support some basic ODATA query $top, $select, $order, $filter, $skip.
+1. Build EDM model dynamically for per request. This request will be heavy if you have database which has lots of table, in that case you can think caching EDM model per database.
+
+2. Convert ODATA query to SQL directly. This implementation just support some basic ODATA queries: $top, $select, $order, $filter, $skip.

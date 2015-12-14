@@ -6,8 +6,10 @@ Dynamic ODATA is ODATA service which dynamically get your data in any database t
 
 If you want to get data from Adventure, just add the connection string into web.config:
 
-     <add name="adventure" connectionString="data source=.\SQLEXPRESS;initial catalog=AdventureWorks2014;User ID=sa;Password=123456;"/>
+     <add name="adventure" connectionString="data source=.\SQLEXPRESS;initial catalog=AdventureWorks2014;User ID={username};Password={password};"/>
 
 Then ODATA service will be available at: 
 
     localhost:{port}/odata/adventure
+    
+

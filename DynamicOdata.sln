@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicOdata.Web", "DynamicOdata.Web\DynamicOdata.Web.csproj", "{1D4A7965-C311-45C8-8AFE-9D49C77F4E87}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicOdata.Service", "DynamicOdata.Service\DynamicOdata.Service.csproj", "{710DB042-928E-4D16-BF8F-9DBF6605D1CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicOdata.Tests", "DynamicOdata.Tests\DynamicOdata.Tests.csproj", "{13510D2D-E61D-4590-A00E-E96891E3A25A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{710DB042-928E-4D16-BF8F-9DBF6605D1CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{710DB042-928E-4D16-BF8F-9DBF6605D1CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{710DB042-928E-4D16-BF8F-9DBF6605D1CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13510D2D-E61D-4590-A00E-E96891E3A25A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13510D2D-E61D-4590-A00E-E96891E3A25A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13510D2D-E61D-4590-A00E-E96891E3A25A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13510D2D-E61D-4590-A00E-E96891E3A25A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

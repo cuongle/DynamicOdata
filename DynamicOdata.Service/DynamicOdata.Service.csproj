@@ -82,6 +82,7 @@
     <Compile Include="Impl\EdmModelBuilder.cs" />
     <Compile Include="IDataService.cs" />
     <Compile Include="IEdmModelBuilder.cs" />
+    <Compile Include="Impl\SchemaViewsReader.cs" />
     <Compile Include="Impl\SchemaReader.cs" />
     <Compile Include="ISchemaReader.cs" />
     <Compile Include="Models\DatabaseColumn.cs" />

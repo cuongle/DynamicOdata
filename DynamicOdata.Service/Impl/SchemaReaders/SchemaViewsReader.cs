@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data.SqlClient;
-using System.Dynamic;
 using System.Linq;
 using Dapper;
 using DynamicOdata.Service.Models;
 
-namespace DynamicOdata.Service.Impl
+namespace DynamicOdata.Service.Impl.SchemaReaders
 {
   public class SchemaViewsReader : ISchemaReader
   {
-    public const string DefaultSchemaName = "dbo";
     private readonly string _connectionString;
     private readonly string _schemaName;
-
-    public SchemaViewsReader(string databaseConnenctionString)
-      : this(databaseConnenctionString, DefaultSchemaName)
-    {
-    }
 
     public SchemaViewsReader(string databaseConnectionString, string schemaName)
     {
@@ -38,7 +30,12 @@ namespace DynamicOdata.Service.Impl
 
     public IEnumerable<DatabaseTable> GetTables(IEnumerable<TableInfo> tableInfos)
     {
-      var columns = GetColumns(tableInfos);
+      if (tableInfos != null)
+      {
+        throw new NotSupportedException("Filtering by views is not supported.");
+      }
+
+      var columns = GetColumns();
       List<DatabaseTable> tables = new List<DatabaseTable>();
 
       foreach (var schema in columns.GroupBy(c => c.Schema))
@@ -57,7 +54,7 @@ namespace DynamicOdata.Service.Impl
       return tables;
     }
 
-    private CommandDefinition BuildSql(IEnumerable<TableInfo> viewsFilter)
+    private CommandDefinition BuildSql()
     {
       string sql = @"
                 SELECT
@@ -74,48 +71,17 @@ namespace DynamicOdata.Service.Impl
 
       DynamicParameters commandParameters = new DynamicParameters();
 
-      var viewsInfo = viewsFilter?.ToList();
-
-      //TODO: add logging info about ignoring schema from ctor if filters are passed
-      if (viewsInfo != null)
-      {
-        var count = viewsInfo.Count;
-
-        var pairClauses = new List<string>();
-        for (int i = 0; i < count; i++)
-        {
-          var info = viewsInfo[i];
-
-          string schemaName = $"tableSchema_{i}";
-          string tableName = $"tableName_{i}";
-
-          pairClauses.Add($"(schema_name(t.schema_id) = @{schemaName} AND t.name = @{tableName})");
-
-          commandParameters.Add(schemaName, info.Schema);
-          commandParameters.Add(tableName, info.Name);
-        }
-
-        string whereClause = string.Join(" OR ", pairClauses);
-
-        if (!string.IsNullOrEmpty(whereClause))
-        {
-          sql += " WHERE " + whereClause;
-        }
-      }
-      else
-      {
-        sql += " WHERE schema_name(t.schema_id) = @schema";
-        commandParameters.Add("@schema", _schemaName);
-      }
+      sql += " WHERE schema_name(t.schema_id) = @schema";
+      commandParameters.Add("@schema", _schemaName);
 
       var commandDefinition = new CommandDefinition(sql, commandParameters);
 
       return commandDefinition;
     }
 
-    private IEnumerable<DatabaseColumn> GetColumns(IEnumerable<TableInfo> onlySpecifiedViews)
+    private IEnumerable<DatabaseColumn> GetColumns()
     {
-      CommandDefinition cmd = BuildSql(onlySpecifiedViews);
+      CommandDefinition cmd = BuildSql();
 
       using (var connection = new SqlConnection(_connectionString))
       {

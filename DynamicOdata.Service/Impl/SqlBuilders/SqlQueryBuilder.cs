@@ -4,7 +4,7 @@ using Microsoft.Data.Edm.Library;
 using Microsoft.Data.OData.Query;
 using Microsoft.Data.OData.Query.SemanticAst;
 
-namespace DynamicOdata.Service
+namespace DynamicOdata.Service.Impl.SqlBuilders
 {
     public class SqlQueryBuilder
     {

@@ -201,3 +201,4 @@ dump.rdb
 
 # GhostDoc
 *.GhostDoc.xml
+/tests

@@ -4,6 +4,8 @@ using System.Web.Http;
 using System.Web.Http.OData.Routing;
 using System.Web.Http.OData.Routing.Conventions;
 using DynamicOdata.Service.Impl;
+using DynamicOdata.Service.Impl.EdmBuilders;
+using DynamicOdata.Service.Impl.SchemaReaders;
 using Microsoft.Data.Edm;
 
 namespace DynamicOdata.Web.Routing

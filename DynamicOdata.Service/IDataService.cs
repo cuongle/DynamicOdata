@@ -6,10 +6,10 @@ namespace DynamicOdata.Service
 {
     public interface IDataService
     {
-        EdmEntityObjectCollection Get(IEdmCollectionType collectionType, ODataQueryOptions queryOptions);
+      int Count(IEdmCollectionType collectionType, ODataQueryOptions queryOptions);
 
-        EdmEntityObject Get(string key, IEdmEntityType entityType);
+      EdmEntityObjectCollection Get(IEdmCollectionType collectionType, ODataQueryOptions queryOptions);
 
-        int Count(IEdmCollectionType collectionType, ODataQueryOptions queryOptions);
+      EdmEntityObject Get(string key, IEdmEntityType entityType);
     }
 }

@@ -8,13 +8,23 @@ using Autofac;
 using Autofac.Integration.WebApi;
 using DynamicOdata.Service;
 using DynamicOdata.Service.Impl;
+using DynamicOdata.Service.Impl.EdmBuilders;
+using DynamicOdata.Service.Impl.SchemaReaders;
 using DynamicOdata.Web.Routing;
 
 namespace DynamicOdata.Web
 {
     public static class WebApiConfig
     {
-        private static void RegisterAutofac(HttpConfiguration configuration)
+      public static void Register(HttpConfiguration config)
+        {
+            RegisterAutofac(config);
+
+            DynamicModelHelper.CustomMapODataServiceRoute(config.Routes, "odata", "odata");
+            config.AddODataQueryFilter();
+        }
+
+      private static void RegisterAutofac(HttpConfiguration configuration)
         {
             var builder = new ContainerBuilder();
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
@@ -30,21 +40,13 @@ namespace DynamicOdata.Web
 
             builder.Register(_ => new DataService(odataEndpointFunc())).As<IDataService>();
             builder.Register(_ => new SchemaReader(odataEndpointFunc())).As<ISchemaReader>();
-         
+
             builder.RegisterType<EdmModelBuilder>().As<IEdmModelBuilder>();
 
             var container = builder.Build();
 
             var autofacResolver = new AutofacWebApiDependencyResolver(container);
             configuration.DependencyResolver = autofacResolver;
-        }
-
-        public static void Register(HttpConfiguration config)
-        {
-            RegisterAutofac(config);
-
-            DynamicModelHelper.CustomMapODataServiceRoute(config.Routes, "odata", "odata");
-            config.AddODataQueryFilter();
         }
     }
 }

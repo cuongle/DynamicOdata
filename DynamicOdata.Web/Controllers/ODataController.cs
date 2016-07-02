@@ -9,18 +9,18 @@ using Microsoft.Data.Edm;
 
 namespace DynamicOdata.Web.Controllers
 {
-    public class DynamicController : ODataController
+    public class ODataController : System.Web.Http.OData.ODataController
     {
-        private readonly IDataService _dataService;
-        private readonly IEdmModelBuilder _edmModelBuilder;
+      private readonly IDataService _dataService;
+      private readonly IEdmModelBuilder _edmModelBuilder;
 
-        public DynamicController(IDataService dataService, IEdmModelBuilder edmModelBuilder)
+      public ODataController(IDataService dataService, IEdmModelBuilder edmModelBuilder)
         {
             _dataService = dataService;
             _edmModelBuilder = edmModelBuilder;
         }
 
-        public EdmEntityObjectCollection Get()
+      public EdmEntityObjectCollection Get()
         {
             ODataPath path = Request.ODataProperties().Path;
             var collectionType = path.EdmType as IEdmCollectionType;
@@ -49,7 +49,7 @@ namespace DynamicOdata.Web.Controllers
             return collection;
         }
 
-        public IEdmEntityObject Get(string key)
+      public IEdmEntityObject Get(string key)
         {
             ODataPath path = Request.ODataProperties().Path;
             IEdmEntityType entityType = path.EdmType as IEdmEntityType;

@@ -33,7 +33,7 @@ namespace DynamicOdata.Tests.Service.Impl
       var edmModel = edmTreeModelBuilder.GetModel();
       var edmSchemaType = edmModel.FindType("dbo.Case2Obligation");
       var edmCollectionType = edmModel.FindDeclaredEntityContainer("container").FindEntitySet("Case2Obligation");
-      var oDataQueryContext = new ODataQueryContext(edmModel, edmSchemaType );
+      var oDataQueryContext = new ODataQueryContext(edmModel, edmSchemaType);
       HttpRequestMessage message = new HttpRequestMessage();
       message.RequestUri = new Uri("http://localhost:81/Case2Obligation?$orderby=Obligation/debtorName asc, Obligation/consumerIdentity/Number desc&$top=3&$skip=1");
 

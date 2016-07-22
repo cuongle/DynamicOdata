@@ -79,9 +79,8 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       var sqlQuery = new SqlQuery();
       var edmEntityType = queryOptions.Context.ElementType as EdmEntityType;
       sqlQuery.Query = FromClause(edmEntityType);
-      string selectClause = BuildSelectClause(queryOptions.SelectExpand);
 
-      sqlQuery.Query = $@"SELECT {selectClause} FROM {sqlQuery.Query}";
+      sqlQuery.Query = $@"SELECT * FROM {sqlQuery.Query}";
       string whereClause = BuildWhereClause(queryOptions.Filter, sqlQuery.Parameters);
 
       if (!string.IsNullOrEmpty(whereClause))
@@ -97,19 +96,6 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       }
 
       return sqlQuery;
-    }
-
-    private static string BuildSelectClause(SelectExpandQueryOption selectExpandQueryOption)
-    {
-      if (selectExpandQueryOption == null)
-      {
-        return "*"; // Select All
-      }
-
-      return selectExpandQueryOption
-        .RawSelect
-        .Split(',')
-        .Aggregate((a,b) => $"{a},[{b}]");
     }
 
     private static void InitializeFunctionParsers(params IFunctionParser[] functionParsers)

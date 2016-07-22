@@ -103,6 +103,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\Impl\EdmBuilders\EdmTreeModelBuilderTests.cs" />
     <Compile Include="Service\Impl\ResultTransformers\RowsToEdmObjectChierarchyResultTransformerTests.cs" />
+    <Compile Include="Service\Impl\ResultTransformers\TestModelBuilder.cs" />
     <Compile Include="Service\Impl\SchemaReaders\SchemaViewsReader.cs" />
     <Compile Include="Service\Impl\DataServiceTests.cs" />
     <Compile Include="Service\Impl\SqlBuilders\SqlQueryBuilderWithObjectChierarchyTests.cs" />

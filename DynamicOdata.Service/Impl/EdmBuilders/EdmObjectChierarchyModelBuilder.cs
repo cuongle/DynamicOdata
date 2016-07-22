@@ -11,9 +11,9 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
 {
   public class EdmObjectChierarchyModelBuilder : IEdmModelBuilder
   {
+    private readonly PluralizationService _pluralizationService;
     private readonly ISchemaReader _schemaReader;
     private readonly char _separator;
-    private PluralizationService _pluralizationService;
 
     public EdmObjectChierarchyModelBuilder(ISchemaReader schemaReader)
       : this(schemaReader, '.')
@@ -39,6 +39,7 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
 
     public EdmModel GetModel()
     {
+      //TODO: add caching
       EdmModel model = new EdmModel();
 
       var databaseTables = _schemaReader.GetTables(null);

@@ -7,7 +7,9 @@ using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
 using DynamicOdata.Service.Impl;
 using DynamicOdata.Service.Impl.EdmBuilders;
+using DynamicOdata.Service.Impl.ResultTransformers;
 using DynamicOdata.Service.Impl.SchemaReaders;
+using DynamicOdata.Service.Impl.SqlBuilders;
 using Microsoft.Data.Edm;
 using Microsoft.Data.Edm.Library;
 using Microsoft.Data.OData;
@@ -19,14 +21,14 @@ namespace DynamicOdata.Tests.Service.Impl
   public class DataServiceTests
   {
     [Test]
-    [Ignore("This is integration proof of concept test.")]
+    ////[Ignore("This is integration proof of concept test.")]
     public void Method_Scenario_Expected()
     {
       // Arrange
 
-      string databaseConnStr = "";
+      string databaseConnStr = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|TestDatabase.mdf;Integrated Security=True";
 
-      var dataService = new DataServiceV2(databaseConnStr);
+      var dataService = new DataServiceV2(databaseConnStr, new SqlQueryBuilderWithObjectChierarchy('.'), new RowsToEdmObjectChierarchyResultTransformer('.') );
       var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(new SchemaViewsReader(databaseConnStr, "dbo"));
       var edmModel = edmTreeModelBuilder.GetModel();
       var edmSchemaType = edmModel.FindType("dbo.Case2Obligation");

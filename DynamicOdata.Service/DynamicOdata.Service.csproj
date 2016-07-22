@@ -85,6 +85,11 @@
     <Compile Include="IDataService.cs" />
     <Compile Include="IEdmModelBuilder.cs" />
     <Compile Include="Impl\EdmBuilders\EdmObjectChierarchyModelBuilder.cs" />
+    <Compile Include="Impl\SqlBuilders\EndsWithFunction.cs" />
+    <Compile Include="Impl\SqlBuilders\IFunctionParser.cs" />
+    <Compile Include="Impl\SqlBuilders\StartsWithFunction.cs" />
+    <Compile Include="Impl\SqlBuilders\SubstringOfFunction.cs" />
+    <Compile Include="Impl\SqlBuilders\SupportedODataQueryOptions.cs" />
     <Compile Include="IResultTransformer.cs" />
     <Compile Include="Impl\ResultTransformers\RowsToEdmObjectChierarchyResultTransformer.cs" />
     <Compile Include="Impl\SchemaReaders\SchemaViewsReader.cs" />

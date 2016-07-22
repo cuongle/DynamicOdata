@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Web.Http.OData.Query;
 using Microsoft.Data.Edm;
 using Microsoft.Data.Edm.Library;
@@ -9,9 +10,33 @@ using Microsoft.Data.OData.Query.SemanticAst;
 
 namespace DynamicOdata.Service.Impl.SqlBuilders
 {
-  internal class SqlQueryBuilderWithObjectChierarchy : ISqlQueryBuilder
+  public class SqlQueryBuilderWithObjectChierarchy : ISqlQueryBuilder
   {
+    private static readonly Dictionary<string, IFunctionParser> FunctionsParsers;
+    private static ODataValidationSettings _supportedODataQueryOptions;
     private readonly char _objectChierarchySeparator;
+
+    static SqlQueryBuilderWithObjectChierarchy()
+    {
+      FunctionsParsers = new Dictionary<string, IFunctionParser>();
+
+      InitializeFunctionParsers(
+        new SubstringOfFunction(),
+        new StartsWithFunction(),
+        new EndsWithFunction());
+
+      _supportedODataQueryOptions = new ODataValidationSettings();
+      _supportedODataQueryOptions.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
+      _supportedODataQueryOptions.AllowedFunctions = AllowedFunctions.StartsWith
+                                                 | AllowedFunctions.EndsWith
+                                                 | AllowedFunctions.Substring;
+      _supportedODataQueryOptions.AllowedLogicalOperators = AllowedLogicalOperators.All;
+      _supportedODataQueryOptions.AllowedQueryOptions = AllowedQueryOptions.Filter
+                                                    | AllowedQueryOptions.InlineCount
+                                                    | AllowedQueryOptions.OrderBy
+                                                    | AllowedQueryOptions.Skip
+                                                    | AllowedQueryOptions.Top;
+    }
 
     public SqlQueryBuilderWithObjectChierarchy(char objectChierarchySeparator)
     {
@@ -23,8 +48,15 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       _objectChierarchySeparator = objectChierarchySeparator;
     }
 
+    public static ODataValidationSettings GetSupportedODataQueryOptions()
+    {
+      return _supportedODataQueryOptions;
+    }
+
     public SqlQuery ToCountSql(ODataQueryOptions queryOptions)
     {
+      ValidateQuery(queryOptions);
+
       var sqlQuery = new SqlQuery();
       var edmEntityType = queryOptions.Context.ElementType as EdmEntityType;
 
@@ -42,22 +74,23 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
 
     public SqlQuery ToSql(ODataQueryOptions queryOptions)
     {
+      ValidateQuery(queryOptions);
+
       var sqlQuery = new SqlQuery();
       var edmEntityType = queryOptions.Context.ElementType as EdmEntityType;
       sqlQuery.Query = FromClause(edmEntityType);
       string selectClause = BuildSelectClause(queryOptions.SelectExpand);
 
       sqlQuery.Query = $@"SELECT {selectClause} FROM {sqlQuery.Query}";
+      string whereClause = BuildWhereClause(queryOptions.Filter, sqlQuery.Parameters);
 
-      Dictionary<string, object> parameters = new Dictionary<string, object>();
-
-      string whereClause = BuildWhereClause(queryOptions.Filter, parameters);
       if (!string.IsNullOrEmpty(whereClause))
       {
         sqlQuery.Query = $"{sqlQuery.Query} WHERE {whereClause}";
       }
 
       string orderClause = BuildOrderClause(edmEntityType, queryOptions.OrderBy, queryOptions.Top, queryOptions.Skip);
+
       if (!string.IsNullOrEmpty(orderClause))
       {
         sqlQuery.Query = $"{sqlQuery.Query} ORDER BY {orderClause}";
@@ -69,12 +102,22 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
     private static string BuildSelectClause(SelectExpandQueryOption selectExpandQueryOption)
     {
       if (selectExpandQueryOption == null)
+      {
         return "*"; // Select All
+      }
 
       return selectExpandQueryOption
         .RawSelect
         .Split(',')
         .Aggregate((a,b) => $"{a},[{b}]");
+    }
+
+    private static void InitializeFunctionParsers(params IFunctionParser[] functionParsers)
+    {
+      foreach (var functionParser in functionParsers)
+      {
+        FunctionsParsers.Add(functionParser.FunctionName, functionParser);
+      }
     }
 
     private string BuildFromPropertyNode(SingleValuePropertyAccessNode left, SingleValueNode right, BinaryOperatorKind operatorKind, Dictionary<string, object> parameters)
@@ -143,7 +186,11 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       return $"{orderClause} {skipTopClause}";
     }
 
-    private string BuildSingleClause(SingleValuePropertyAccessNode propertyNode, ConstantNode valueNode, BinaryOperatorKind operatorKind, Dictionary<string, object> parameters)
+    private string BuildSingleClause(
+      SingleValuePropertyAccessNode propertyNode,
+      ConstantNode valueNode,
+      BinaryOperatorKind operatorKind,
+      Dictionary<string, object> parameters)
     {
       string operatorString = string.Empty;
 
@@ -189,11 +236,22 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
         return $"([{propertyNode.Property.Name}] IS NOT NULL)";
       }
 
-      //TODO: rewrite it to tree query naming
+      List<string> paths = new List<string>();
 
-      parameters.Add(propertyNode.Property.Name, valueNode.Value);
+      do
+      {
+        paths.Add(propertyNode.Property.Name);
 
-      return $"([{propertyNode.Property.Name}] {operatorString} @{propertyNode.Property.Name})";
+        propertyNode = propertyNode.Source as SingleValuePropertyAccessNode;
+      } while (propertyNode != null);
+
+      paths.Reverse();
+
+      var columnName = string.Join(_objectChierarchySeparator.ToString(), paths);
+      var parameterName = string.Join("_", paths);
+      parameters.Add(parameterName, valueNode.Value);
+
+      return $"([{columnName}] {operatorString} @{parameterName})";
     }
 
     private string BuildSkipTopClause(TopQueryOption topQueryOption, SkipQueryOption skipQueryOption)
@@ -221,25 +279,11 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
 
       if (x != null)
       {
-        switch (x.Name.ToLower())
+        var nodeName = x.Name.ToLower();
+
+        if (FunctionsParsers.ContainsKey(nodeName))
         {
-          case "substringof":
-            var property = x.Arguments.OfType<SingleValuePropertyAccessNode>().First();
-            var value = x.Arguments.OfType<ConstantNode>().First();
-            result += string.Format("{0} like '%{1}%'", property.Property.Name, value.Value);
-            break;
-
-          case "startswith":
-            var property1 = x.Arguments.OfType<SingleValuePropertyAccessNode>().First();
-            var value2 = x.Arguments.OfType<ConstantNode>().First();
-            result += string.Format("{0} like '{1}%'", property1.Property.Name, value2.Value);
-            break;
-
-          case "endswith":
-            var property3 = x.Arguments.OfType<SingleValuePropertyAccessNode>().First();
-            var value4 = x.Arguments.OfType<ConstantNode>().First();
-            result += string.Format("{0} like '%{1}'", property3.Property.Name, value4.Value);
-            break;
+          result += FunctionsParsers[nodeName].Parse(x);
         }
       }
 
@@ -308,6 +352,11 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       }
 
       return edmEntityType.DeclaredKey.Any();
+    }
+
+    private void ValidateQuery(ODataQueryOptions queryOptions)
+    {
+      queryOptions.Validate(GetSupportedODataQueryOptions());
     }
   }
 }

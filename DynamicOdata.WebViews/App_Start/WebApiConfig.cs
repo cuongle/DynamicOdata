@@ -18,7 +18,9 @@ using Autofac.Integration.WebApi;
 using DynamicOdata.Service;
 using DynamicOdata.Service.Impl;
 using DynamicOdata.Service.Impl.EdmBuilders;
+using DynamicOdata.Service.Impl.ResultTransformers;
 using DynamicOdata.Service.Impl.SchemaReaders;
+using DynamicOdata.Service.Impl.SqlBuilders;
 using Microsoft.Data.Edm;
 using Microsoft.Data.Edm.Library;
 using Microsoft.Data.OData;
@@ -45,9 +47,6 @@ namespace DynamicOdata.WebViews
 
       config.Routes.Add("odata", oDataRoute);
       config.AddODataQueryFilter();
-
-      GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-      GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.Formatting = Formatting.None;
     }
 
     private static void RegisterAutofac(HttpConfiguration configuration)
@@ -57,11 +56,11 @@ namespace DynamicOdata.WebViews
 
       var connectionStringSettings = ConfigurationManager.ConnectionStrings["default"];
       var schemaViewsReader = new SchemaViewsReader(connectionStringSettings.ConnectionString, "dbo");
-
       var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(schemaViewsReader);
+      var dataServiceV2 = new DataServiceV2(connectionStringSettings.ConnectionString, new SqlQueryBuilderWithObjectChierarchy('.'), new RowsToEdmObjectChierarchyResultTransformer('.'));
 
       builder.Register(_ => edmTreeModelBuilder.GetModel()).As<EdmModel>().SingleInstance();
-      builder.Register(_ => new DataServiceV2("default")).As<IDataService>().SingleInstance();
+      builder.Register(_ => dataServiceV2).As<IDataService>().SingleInstance();
       builder.Register(_ => schemaViewsReader).As<ISchemaReader>().SingleInstance();
 
       var container = builder.Build();

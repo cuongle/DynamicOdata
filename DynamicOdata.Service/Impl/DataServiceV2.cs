@@ -22,11 +22,6 @@ namespace DynamicOdata.Service.Impl
     private readonly IResultTransformer _resultTransformer;
     private readonly ISqlQueryBuilder _sqlQueryBuilder;
 
-    public DataServiceV2(string databaseConnectionString)
-      : this(databaseConnectionString, new SqlQueryBuilderWithObjectChierarchy('.'), new RowsToEdmObjectChierarchyResultTransformer('.'))
-    {
-    }
-
     public DataServiceV2(string databaseConnectionString, ISqlQueryBuilder sqlQueryBuilder, IResultTransformer resultTransformer)
     {
       if (String.IsNullOrWhiteSpace(databaseConnectionString))
@@ -70,9 +65,10 @@ namespace DynamicOdata.Service.Impl
 
     public EdmEntityObjectCollection Get(IEdmCollectionType collectionType, ODataQueryOptions queryOptions)
     {
+      var sql = _sqlQueryBuilder.ToSql(queryOptions);
+
       using (var connection = new SqlConnection(_connectionString))
       {
-        var sql = _sqlQueryBuilder.ToSql(queryOptions);
         var cmd = new CommandDefinition(sql.Query, sql.Parameters, commandType: CommandType.Text);
 
         IEnumerable<IDictionary<string, object>> rows = connection.Query<dynamic>(cmd)

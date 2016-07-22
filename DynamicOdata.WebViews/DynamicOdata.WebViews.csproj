@@ -114,6 +114,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ODataController.cs" />
     <Compile Include="Controllers\ODataMetadataController.cs" />
+    <Compile Include="Controllers\ODataQueryOptionsBinder.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

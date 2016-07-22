@@ -1,37 +1,31 @@
 ﻿using System.Net;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
 using System.Web.Http.OData;
 using System.Web.Http.OData.Extensions;
 using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
+using System.Web.ModelBinding;
 using DynamicOdata.Service;
 using Microsoft.Data.Edm;
-using Microsoft.Data.Edm.Library;
 
 namespace DynamicOdata.WebViews.Controllers
 {
   public class OdataController : System.Web.Http.OData.ODataController
   {
     private readonly IDataService _dataService;
-    private readonly EdmModel _edmModelBuilder;
 
-    public OdataController(IDataService dataService, EdmModel edmModelBuilder)
+    public OdataController(IDataService dataService)
     {
       _dataService = dataService;
-      _edmModelBuilder = edmModelBuilder;
     }
 
-    public EdmEntityObjectCollection Get()
+    public EdmEntityObjectCollection Get([ModelBinder(typeof(ODataQueryOptionsBinder))] ODataQueryOptions queryOptions)
     {
-      ODataPath path = Request.ODataProperties().Path;
-      var collectionType = path.EdmType as IEdmCollectionType;
-      var entityType = collectionType?.ElementType.Definition as IEdmEntityType;
-
-      var queryContext = new ODataQueryContext(_edmModelBuilder, entityType);
-      var queryOptions = new ODataQueryOptions(queryContext, Request);
+      var oDataProperties = Request.ODataProperties();
+      var collectionType = oDataProperties.Path.EdmType as IEdmCollectionType;
 
       // make $count works
-      var oDataProperties = Request.ODataProperties();
       if (queryOptions.InlineCount != null)
       {
         oDataProperties.TotalCount = _dataService.Count(collectionType, queryOptions);
@@ -57,7 +51,9 @@ namespace DynamicOdata.WebViews.Controllers
 
       // make sure return 404 if key does not exist in database
       if (entity == null)
+      {
         throw new HttpResponseException(HttpStatusCode.NotFound);
+      }
 
       return entity;
     }

@@ -39,7 +39,6 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
 
     public EdmModel GetModel()
     {
-      //TODO: add caching
       EdmModel model = new EdmModel();
 
       var databaseTables = _schemaReader.GetTables(null);

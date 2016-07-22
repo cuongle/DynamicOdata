@@ -72,6 +72,7 @@ namespace DynamicOdata.Service.Impl.ResultTransformers
           var edmComplexObject = new EdmComplexObject(declaredProperty.Type.AsComplex());
 
           actualEntity.TrySetPropertyValue(componentName, edmComplexObject);
+          actualEntity = edmComplexObject;
         }
         else
         {

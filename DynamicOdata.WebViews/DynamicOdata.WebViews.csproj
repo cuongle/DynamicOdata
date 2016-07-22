@@ -111,10 +111,13 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Infrastructure\CustomODataPathRouteConstraint.cs" />
+    <Compile Include="Infrastructure\DynamicRoutingConvention.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Infrastructure\Binders\ODataRequestPropertiesBinder.cs" />
     <Compile Include="Controllers\ODataController.cs" />
     <Compile Include="Controllers\ODataMetadataController.cs" />
-    <Compile Include="Controllers\ODataQueryOptionsBinder.cs" />
+    <Compile Include="Infrastructure\Binders\ODataQueryOptionsBinder.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -133,7 +136,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DynamicOdata.Service\DynamicOdata.Service.csproj">

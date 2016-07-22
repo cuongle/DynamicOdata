@@ -7,6 +7,7 @@ using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
 using System.Web.ModelBinding;
 using DynamicOdata.Service;
+using DynamicOdata.WebViews.Infrastructure.Binders;
 using Microsoft.Data.Edm;
 
 namespace DynamicOdata.WebViews.Controllers
@@ -20,9 +21,8 @@ namespace DynamicOdata.WebViews.Controllers
       _dataService = dataService;
     }
 
-    public EdmEntityObjectCollection Get([ModelBinder(typeof(ODataQueryOptionsBinder))] ODataQueryOptions queryOptions)
+    public EdmEntityObjectCollection Get([ModelBinder(typeof(ODataQueryOptionsBinder))] ODataQueryOptions queryOptions, [ModelBinder(typeof(ODataRequestPropertiesBinder))]HttpRequestMessageProperties oDataProperties)
     {
-      var oDataProperties = Request.ODataProperties();
       var collectionType = oDataProperties.Path.EdmType as IEdmCollectionType;
 
       // make $count works
@@ -42,9 +42,9 @@ namespace DynamicOdata.WebViews.Controllers
       return collection;
     }
 
-    public IEdmEntityObject Get(string key)
+    public IEdmEntityObject Get(string key, [ModelBinder(typeof(ODataRequestPropertiesBinder))]HttpRequestMessageProperties oDataProperties)
     {
-      ODataPath path = Request.ODataProperties().Path;
+      ODataPath path = oDataProperties.Path;
       IEdmEntityType entityType = path.EdmType as IEdmEntityType;
 
       var entity = _dataService.Get(key, entityType);

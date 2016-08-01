@@ -14,7 +14,7 @@ namespace DynamicOdata.Tests.Service.Impl.SchemaReaders
     private string _dbConnectionString;
     private string _testSchema = "SchemaViewsReaderTests";
 
-    [OneTimeSetUp]
+    [TestFixtureSetUp]
     public void OneTimeSetUp()
     {
       _dbConnectionString = ConfigurationManager.ConnectionStrings["LocalDb"].ConnectionString;

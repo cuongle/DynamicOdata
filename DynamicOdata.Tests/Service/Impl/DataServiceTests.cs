@@ -21,7 +21,7 @@ namespace DynamicOdata.Tests.Service.Impl
   public class DataServiceTests
   {
     [Test]
-    ////[Ignore("This is integration proof of concept test.")]
+    [Ignore("This is integration proof of concept test.")]
     public void Method_Scenario_Expected()
     {
       // Arrange

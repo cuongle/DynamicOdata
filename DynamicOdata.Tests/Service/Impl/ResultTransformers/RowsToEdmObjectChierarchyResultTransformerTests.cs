@@ -16,7 +16,7 @@ namespace DynamicOdata.Tests.Service.Impl.ResultTransformers
   {
     private RowsToEdmObjectChierarchyResultTransformer _sut;
 
-    [OneTimeSetUp]
+    [SetUp]
     public void OneTimeSetUp()
     {
       _sut = new RowsToEdmObjectChierarchyResultTransformer('.');

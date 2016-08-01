@@ -19,7 +19,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
     private ODataQueryContext _oDataQueryContext;
     private SqlQueryBuilderWithObjectChierarchy _sut;
 
-    [OneTimeSetUp]
+    [TestFixtureSetUp]
     public void OneTimeSetUp()
     {
       _sut = new SqlQueryBuilderWithObjectChierarchy('.');
@@ -27,7 +27,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       var edmModel = TestModelBuilder.BuildModel();
       var edmSchemaType = edmModel.SchemaElements.FirstOrDefault(w => w.Name == TestModelBuilder.TestEntityName) as IEdmSchemaType;
       _oDataQueryContext = new ODataQueryContext(edmModel, edmSchemaType);
-      }
+    }
 
     [Test]
     public void ToSql_OrderByChierarchicalNamePassed_ItIsReplacedInSql()

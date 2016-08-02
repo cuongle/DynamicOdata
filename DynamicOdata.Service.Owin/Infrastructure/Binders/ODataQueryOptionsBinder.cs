@@ -6,9 +6,9 @@ using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
 using Microsoft.Data.Edm;
 
-namespace DynamicOdata.WebViews.Infrastructure.Binders
+namespace DynamicOdata.Service.Owin.Infrastructure.Binders
 {
-  public class ODataQueryOptionsBinder : IModelBinder
+  internal class ODataQueryOptionsBinder : IModelBinder
   {
     public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
     {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -10,11 +11,11 @@ using System.Web.Http.Routing;
 using Microsoft.Data.Edm;
 using Microsoft.Data.Edm.Library;
 
-namespace DynamicOdata.WebViews.Infrastructure
+namespace DynamicOdata.Service.Owin.Infrastructure
 {
-  public class CustomODataPathRouteConstraint : ODataPathRouteConstraint
+  internal class CustomODataPathRouteConstraint : ODataPathRouteConstraint
   {
-    private static readonly string EscapedSlash = Uri.HexEscape('/');
+    private static readonly string _escapedSlash = Uri.HexEscape('/');
 
     public CustomODataPathRouteConstraint(
       IODataPathHandler pathHandler,
@@ -28,21 +29,28 @@ namespace DynamicOdata.WebViews.Infrastructure
 
     public Func<HttpRequestMessage, IEdmModel> EdmModelProvider { get; set; }
 
-    public override bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName,
-      IDictionary<string, object> values, HttpRouteDirection routeDirection)
+    public override bool Match(HttpRequestMessage request, IHttpRoute route, string parameterName, IDictionary<string, object> values, HttpRouteDirection routeDirection)
     {
       if (request == null)
+      {
         throw new ArgumentNullException(nameof(request));
+      }
 
       if (values == null)
+      {
         throw new ArgumentNullException(nameof(values));
+      }
 
       if (routeDirection != HttpRouteDirection.UriResolution)
+      {
         return true;
+      }
 
       object oDataPathValue;
       if (!values.TryGetValue(ODataRouteConstants.ODataPath, out oDataPathValue))
+      {
         return false;
+      }
 
       string oDataPathString = oDataPathValue as string;
 
@@ -61,10 +69,13 @@ namespace DynamicOdata.WebViews.Infrastructure
         }
 
         string oDataPathAndQuery = requestLeftPart.Substring(serviceRoot.Length);
+        oDataPathAndQuery = WebUtility.UrlDecode(oDataPathAndQuery);
         path = PathHandler.Parse(model, oDataPathAndQuery);
       }
-      catch (Exception ex)
+      catch (Exception)
       {
+        throw;
+        //TODO: add logging
         throw new HttpResponseException(HttpStatusCode.NotFound);
       }
 
@@ -98,18 +109,23 @@ namespace DynamicOdata.WebViews.Infrastructure
     {
       int endIndex = uriString.Length - oDataPathString.Length - 1;
       if (endIndex <= 0)
-        throw new InvalidOperationException($"Request Uri Is Too Short For ODataPath. the Uri is {uriString}, and the OData path is {oDataPathString}.");
+      {
+        throw new InvalidOperationException(
+          $"Request Uri Is Too Short For ODataPath. the Uri is {uriString}, and the OData path is {oDataPathString}.");
+      }
 
       string startString = uriString.Substring(0, endIndex + 1);  // Potential return value.
       string endString = uriString.Substring(endIndex + 1);       // Potential oDataPathString match.
 
       if (string.Equals(endString, oDataPathString, StringComparison.Ordinal))
+      {
         return startString;
+      }
 
       while (true)
       {
         int slashIndex = startString.LastIndexOf('/', endIndex - 1);
-        int escapedSlashIndex = startString.LastIndexOf(EscapedSlash, endIndex - 1, StringComparison.OrdinalIgnoreCase);
+        int escapedSlashIndex = startString.LastIndexOf(_escapedSlash, endIndex - 1, StringComparison.OrdinalIgnoreCase);
 
         if (slashIndex > escapedSlashIndex)
         {
@@ -117,7 +133,7 @@ namespace DynamicOdata.WebViews.Infrastructure
         }
         else if (escapedSlashIndex >= 0)
         {
-          endIndex = escapedSlashIndex + 2;
+          endIndex = escapedSlashIndex + 1 + 1;
         }
         else
         {
@@ -129,10 +145,15 @@ namespace DynamicOdata.WebViews.Infrastructure
 
         endString = Uri.UnescapeDataString(endString);
         if (string.Equals(endString, oDataPathString, StringComparison.Ordinal))
+        {
           return startString;
+        }
 
         if (endIndex == 0)
-          throw new InvalidOperationException($"The OData path is not found. The Uri is {uriString}, and the OData path is {oDataPathString}.");
+        {
+          throw new InvalidOperationException(
+            $"The OData path is not found. The Uri is {uriString}, and the OData path is {oDataPathString}.");
+        }
       }
     }
   }

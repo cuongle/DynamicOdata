@@ -4,10 +4,12 @@ using System.Web.Http.Controllers;
 using System.Web.Http.OData.Routing;
 using System.Web.Http.OData.Routing.Conventions;
 
-namespace DynamicOdata.WebViews.Infrastructure
+namespace DynamicOdata.Service.Owin.Infrastructure
 {
-  public class DynamicRoutingConvention : IODataRoutingConvention
+  internal class DynamicRoutingConvention : IODataRoutingConvention
   {
+    private const string ControllerSuffix = "Controller";
+
     public string SelectAction(ODataPath odataPath, HttpControllerContext controllerContext, ILookup<string, HttpActionDescriptor> actionMap)
     {
       return null;
@@ -16,9 +18,11 @@ namespace DynamicOdata.WebViews.Infrastructure
     public string SelectController(ODataPath odataPath, HttpRequestMessage request)
     {
       if (odataPath.Segments.FirstOrDefault() is EntitySetPathSegment)
-        return "OData";
+      {
+        return typeof(OdataController).Name.Replace(ControllerSuffix, string.Empty);
+      }
 
-      return "DynamicOdataMetadata";
+      return typeof(DynamicOdataMetadataController).Name.Replace(ControllerSuffix, string.Empty);
     }
   }
 }

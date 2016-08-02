@@ -1,6 +1,6 @@
 ﻿using System.Web.Http.OData;
 
-namespace DynamicOdata.WebViews.Controllers
+namespace DynamicOdata.Service.Owin.Infrastructure
 {
   public class DynamicOdataMetadataController : ODataMetadataController
   {}

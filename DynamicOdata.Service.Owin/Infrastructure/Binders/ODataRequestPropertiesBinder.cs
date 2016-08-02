@@ -2,7 +2,7 @@
 using System.Web.Http.ModelBinding;
 using System.Web.Http.OData.Extensions;
 
-namespace DynamicOdata.WebViews.Infrastructure.Binders
+namespace DynamicOdata.Service.Owin.Infrastructure.Binders
 {
   internal class ODataRequestPropertiesBinder : IModelBinder
   {

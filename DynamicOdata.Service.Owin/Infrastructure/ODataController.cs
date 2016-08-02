@@ -5,30 +5,21 @@ using System.Web.Http.OData;
 using System.Web.Http.OData.Extensions;
 using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
-using System.Web.ModelBinding;
-using DynamicOdata.Service;
-using DynamicOdata.WebViews.Infrastructure.Binders;
+using DynamicOdata.Service.Owin.Infrastructure.Binders;
 using Microsoft.Data.Edm;
 
-namespace DynamicOdata.WebViews.Controllers
+namespace DynamicOdata.Service.Owin.Infrastructure
 {
   public class OdataController : System.Web.Http.OData.ODataController
   {
-    private readonly IDataService _dataService;
-
-    public OdataController(IDataService dataService)
-    {
-      _dataService = dataService;
-    }
-
-    public EdmEntityObjectCollection Get([ModelBinder(typeof(ODataQueryOptionsBinder))] ODataQueryOptions queryOptions, [ModelBinder(typeof(ODataRequestPropertiesBinder))]HttpRequestMessageProperties oDataProperties)
+    public EdmEntityObjectCollection Get([ModelBinder] ODataQueryOptions queryOptions, [ModelBinder] HttpRequestMessageProperties oDataProperties, [ModelBinder]IDataService dataService)
     {
       var collectionType = oDataProperties.Path.EdmType as IEdmCollectionType;
 
       // make $count works
       if (queryOptions.InlineCount != null)
       {
-        oDataProperties.TotalCount = _dataService.Count(collectionType, queryOptions);
+        oDataProperties.TotalCount = dataService.Count(collectionType, queryOptions);
       }
 
       //make $select works
@@ -37,17 +28,17 @@ namespace DynamicOdata.WebViews.Controllers
         oDataProperties.SelectExpandClause = queryOptions.SelectExpand.SelectExpandClause;
       }
 
-      var collection = _dataService.Get(collectionType, queryOptions);
+      var collection = dataService.Get(collectionType, queryOptions);
 
       return collection;
     }
 
-    public IEdmEntityObject Get(string key, [ModelBinder(typeof(ODataRequestPropertiesBinder))]HttpRequestMessageProperties oDataProperties)
+    public IEdmEntityObject Get(string key, [ModelBinder]HttpRequestMessageProperties oDataProperties, [ModelBinder]IDataService dataService)
     {
       ODataPath path = oDataProperties.Path;
       IEdmEntityType entityType = path.EdmType as IEdmEntityType;
 
-      var entity = _dataService.Get(key, entityType);
+      var entity = dataService.Get(key, entityType);
 
       // make sure return 404 if key does not exist in database
       if (entity == null)

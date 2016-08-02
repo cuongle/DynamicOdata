@@ -35,10 +35,6 @@
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DynamicOdata.Service, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\DynamicOdata.Service\bin\Debug\DynamicOdata.Service.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Edm.5.7.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
       <Private>True</Private>
@@ -96,6 +92,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DynamicOdata.Service\DynamicOdata.Service.csproj">
+      <Project>{710db042-928e-4d16-bf8f-9dbf6605d1cd}</Project>
+      <Name>DynamicOdata.Service</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

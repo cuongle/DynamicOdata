@@ -8,12 +8,13 @@ namespace DynamicOdata.WebViews
   {
     public static void Register(HttpConfiguration config)
     {
-      var oDataServiceSettings = new ODataServiceSettings();
-      oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["default"].ConnectionString;
-      oDataServiceSettings.RoutePrefix = "odata";
-      oDataServiceSettings.Schema = "dbo";
-
-      config.RegisterDynamicOData(oDataServiceSettings);
+      config.RegisterDynamicOData(
+        oDataServiceSettings =>
+        {
+          oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["default"].ConnectionString;
+          oDataServiceSettings.RoutePrefix = "odata";
+          oDataServiceSettings.Schema = "dbo";
+        });
     }
   }
 }

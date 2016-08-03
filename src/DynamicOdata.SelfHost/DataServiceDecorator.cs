@@ -6,11 +6,11 @@ using Microsoft.Data.Edm;
 
 namespace DynamicOdata.SelfHost
 {
-  internal class DataServiceExtensionWrapper : IDataService
+  internal class DataServiceDecorator : IDataService
   {
     private readonly IDataService _dataService;
 
-    public DataServiceExtensionWrapper(IDataService dataService)
+    public DataServiceDecorator(IDataService dataService)
     {
       if (dataService == null)
       {

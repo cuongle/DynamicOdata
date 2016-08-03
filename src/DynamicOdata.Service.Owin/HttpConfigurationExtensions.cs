@@ -24,12 +24,20 @@ namespace DynamicOdata.Service.Owin
 {
   public static class HttpConfigurationExtensions
   {
-    public static void RegisterDynamicOData(this HttpConfiguration config, ODataServiceSettings settings)
+    public static void RegisterDynamicOData(this HttpConfiguration config, Action<ODataServiceSettings> configureSettings)
     {
       var routeName = $"ODataService_{Guid.NewGuid().ToString("N")}";
 
       var routingConventions = ODataRoutingConventions.CreateDefault();
       routingConventions.Insert(0, new DynamicRoutingConvention());
+
+      ODataServiceSettings settings = new ODataServiceSettings();
+      settings.Services.DataService = s => new DataServiceV2(
+          s.ConnectionString,
+          new SqlQueryBuilderWithObjectChierarchy('.'),
+          new RowsToEdmObjectChierarchyResultTransformer('.'));
+
+      configureSettings(settings);
 
       var schemaViewsReader = new SchemaViewsReader(settings.ConnectionString, settings.Schema);
       var edmModel = new EdmObjectChierarchyModelBuilder(schemaViewsReader).GetModel();
@@ -42,19 +50,7 @@ namespace DynamicOdata.Service.Owin
           routeName,
           routingConventions));
 
-      IDataService dataService;
-
-      if (settings.Services.DataService == null)
-      {
-        dataService = new DataServiceV2(
-          settings.ConnectionString,
-          new SqlQueryBuilderWithObjectChierarchy('.'),
-          new RowsToEdmObjectChierarchyResultTransformer('.'));
-      }
-      else
-      {
-        dataService = settings.Services.DataService();
-      }
+      IDataService dataService = settings.Services.DataService(settings);
 
       config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(ODataQueryOptions), new ODataQueryOptionsBinder()));
       config.Services.Insert(typeof(ModelBinderProvider),0,new SimpleModelBinderProvider(typeof(HttpRequestMessageProperties), new ODataRequestPropertiesBinder()));

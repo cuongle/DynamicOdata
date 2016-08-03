@@ -25,24 +25,22 @@ namespace DynamicOdata.SelfHost
   {
     public void Configuration(IAppBuilder app)
     {
-      var oDataServiceSettings = new ODataServiceSettings();
-      oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["default"].ConnectionString;
-      oDataServiceSettings.RoutePrefix = "odata";
-      oDataServiceSettings.Schema = "dbo";
-
-      //// extension point for replacing data service - by Default instance does not need to be set up
-      ////
-      ////
-      ////oDataServiceSettings.Services.DataService = () => new DataServiceExtensionWrapper(
-      ////  new DataServiceV2(oDataServiceSettings.ConnectionString,
-      ////  new SqlQueryBuilderWithObjectChierarchy('.'),
-      ////  new RowsToEdmObjectChierarchyResultTransformer('.')));
-
       HttpConfiguration config = new HttpConfiguration();
 
       config.EnableSystemDiagnosticsTracing();
 
-      app.UseDynamicOData(config, oDataServiceSettings);
+      app.UseDynamicOData(
+        config,
+        oDataServiceSettings =>
+        {
+          oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["default"].ConnectionString;
+          oDataServiceSettings.RoutePrefix = "odata";
+          oDataServiceSettings.Schema = "dbo";
+
+          //// extension point for replacing data service - by Default instance does not need to be set up
+          ////
+          //// oDataServiceSettings.Services.DataService = s => new DataServiceDecorator(s.Services.DataService(s));
+        });
       app.UseWebApi(config);
     }
   }

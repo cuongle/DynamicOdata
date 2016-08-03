@@ -4,7 +4,7 @@ namespace DynamicOdata.Service.Owin
 {
   public class ODataServiceSettings
   {
-    public ODataServiceSettings()
+    internal ODataServiceSettings()
     {
       Services = new ODataServiceSettingsServices();
     }
@@ -20,6 +20,6 @@ namespace DynamicOdata.Service.Owin
 
   public class ODataServiceSettingsServices
   {
-    public Func<IDataService> DataService { get; set; }
+    public Func<ODataServiceSettings, IDataService> DataService { get; set; }
   }
 }

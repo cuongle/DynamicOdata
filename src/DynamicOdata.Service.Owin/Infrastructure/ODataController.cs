@@ -12,7 +12,10 @@ namespace DynamicOdata.Service.Owin.Infrastructure
 {
   public class OdataController : System.Web.Http.OData.ODataController
   {
-    public EdmEntityObjectCollection Get([ModelBinder] ODataQueryOptions queryOptions, [ModelBinder] HttpRequestMessageProperties oDataProperties, [ModelBinder]IDataService dataService)
+    public EdmEntityObjectCollection Get(
+      [ModelBinder] ODataQueryOptions queryOptions,
+      [ModelBinder] HttpRequestMessageProperties oDataProperties,
+      [ModelBinder] IDataService dataService)
     {
       var collectionType = oDataProperties.Path.EdmType as IEdmCollectionType;
 

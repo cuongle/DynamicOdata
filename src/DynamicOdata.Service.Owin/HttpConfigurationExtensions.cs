@@ -42,20 +42,25 @@ namespace DynamicOdata.Service.Owin
           routeName,
           routingConventions));
 
-      var dataServiceV2 = new DataServiceV2(
-        settings.ConnectionString,
-        new SqlQueryBuilderWithObjectChierarchy('.'),
-        new RowsToEdmObjectChierarchyResultTransformer('.'));
+      IDataService dataService;
+
+      if (settings.Services.DataService == null)
+      {
+        dataService = new DataServiceV2(
+          settings.ConnectionString,
+          new SqlQueryBuilderWithObjectChierarchy('.'),
+          new RowsToEdmObjectChierarchyResultTransformer('.'));
+      }
+      else
+      {
+        dataService = settings.Services.DataService();
+      }
 
       config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(ODataQueryOptions), new ODataQueryOptionsBinder()));
-      config.Services.Insert(
-        typeof(ModelBinderProvider),
-        0,
-        new SimpleModelBinderProvider(typeof(HttpRequestMessageProperties), new ODataRequestPropertiesBinder()));
-      config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(IDataService), () => new DataServiceBinder(dataServiceV2)));
+      config.Services.Insert(typeof(ModelBinderProvider),0,new SimpleModelBinderProvider(typeof(HttpRequestMessageProperties), new ODataRequestPropertiesBinder()));
+      config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(IDataService), () => new DataServiceBinder(dataService)));
 
       config.Routes.Add(routeName, oDataRoute);
-      config.AddODataQueryFilter();
     }
   }
 }

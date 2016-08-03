@@ -1,3 +1,4 @@
+using System;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using DynamicOdata.Service.Impl;
@@ -6,16 +7,21 @@ namespace DynamicOdata.Service.Owin.Infrastructure.Binders
 {
   internal class DataServiceBinder : IModelBinder
   {
-    private readonly DataServiceV2 _dataServiceV2;
+    private readonly IDataService _dataService;
 
-    public DataServiceBinder(DataServiceV2 dataServiceV2)
+    public DataServiceBinder(IDataService dataService)
     {
-      _dataServiceV2 = dataServiceV2;
+      if (dataService == null)
+      {
+        throw new ArgumentNullException(nameof(dataService));
+      }
+
+      _dataService = dataService;
     }
 
     public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
     {
-      bindingContext.Model = _dataServiceV2;
+      bindingContext.Model = _dataService;
 
       return true;
     }

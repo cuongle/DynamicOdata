@@ -33,25 +33,38 @@ namespace DynamicOdata.Service.Impl.ResultTransformers
       var entityType = toCollectionType.ElementType.Definition as EdmEntityType;
       var collection = new EdmEntityObjectCollection(new EdmCollectionTypeReference(toCollectionType, true));
 
+      var firstRow = fromRows.FirstOrDefault();
+
+      if (firstRow == null)
+      {
+        return collection;
+      }
+
       var componentHelpClasses = EntityTypeToColumnsMap.GetOrAdd(
         entityType.Name,
-        entityName => BuildMap(fromRows.FirstOrDefault() as IDictionary<string, object>));
+        entityName => BuildMap(firstRow));
 
       foreach (dynamic row in fromRows)
       {
         var entity = CreateEdmEntity(entityType, row, componentHelpClasses);
         collection.Add(entity);
       }
+
       return collection;
     }
 
     public EdmEntityObject Translate(IDictionary<string, object> fromRow, IEdmType toType)
     {
+      if (fromRow == null)
+      {
+        return null;
+      }
+
       var entityType = toType as EdmEntityType;
 
       var componentHelpClasses = EntityTypeToColumnsMap.GetOrAdd(
         entityType.Name,
-        entityName => BuildMap(fromRow as IDictionary<string, object>));
+        entityName => BuildMap(fromRow));
 
       return CreateEdmEntity(entityType, fromRow, componentHelpClasses);
     }

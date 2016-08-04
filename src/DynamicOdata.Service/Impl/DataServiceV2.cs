@@ -71,7 +71,9 @@ namespace DynamicOdata.Service.Impl
       {
         var cmd = new CommandDefinition(sql.Query, sql.Parameters, commandType: CommandType.Text);
 
-        IEnumerable<IDictionary<string, object>> rows = connection.Query<dynamic>(cmd)
+        IEnumerable<IDictionary<string, object>> rows =
+          connection
+          .Query<dynamic>(cmd)
           .Cast<IDictionary<string, object>>();
 
         var collection = _resultTransformer.Translate(rows, collectionType);

@@ -53,23 +53,28 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
           model.AddElement(container);
         }
 
-        EdmEntityType entity = new EdmEntityType(table.Schema, table.Name);
-
-        var properties = table.Columns.Where(x => !x.Name.Contains(_separator)).ToList();
-        var components = BuildComponentMap(table.Name, string.Empty, table.Columns.Where(w =>w.Name.Contains(_separator)));
-
-        // first add components and references to it
-        AddComponents(model, entity, components);
-
-        // add columns
-        AddProperties(entity, properties);
+        var entity = CreateEdmEntity(table, model);
 
         model.AddElement(entity);
-
         container.AddEntitySet(_pluralizationService.Pluralize(table.Name), entity);
       }
 
       return model;
+    }
+
+    protected virtual EdmEntityType CreateEdmEntity(DatabaseTable table, EdmModel model)
+    {
+      EdmEntityType entity = new EdmEntityType(table.Schema, table.Name);
+
+      var properties = table.Columns.Where(x => !x.Name.Contains(_separator)).ToList();
+      var components = BuildComponentMap(table.Name, string.Empty, table.Columns.Where(w => w.Name.Contains(_separator)));
+
+      // first add components and references to it
+      AddComponents(model, entity, components);
+
+      // add columns
+      AddProperties(entity, properties);
+      return entity;
     }
 
     private static void AddProperties(EdmEntityType entity, IEnumerable<DatabaseColumn> properties)

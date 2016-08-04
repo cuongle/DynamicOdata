@@ -28,19 +28,16 @@ namespace DynamicOdata.Service.Owin
     {
       var routeName = $"ODataService_{Guid.NewGuid().ToString("N")}";
 
-      var routingConventions = ODataRoutingConventions.CreateDefault();
-      routingConventions.Insert(0, new DynamicRoutingConvention());
-
       ODataServiceSettings settings = new ODataServiceSettings();
-      settings.Services.DataService = s => new DataServiceV2(
-          s.ConnectionString,
-          new SqlQueryBuilderWithObjectChierarchy('.'),
-          new RowsToEdmObjectChierarchyResultTransformer('.'));
+      BuildDefaultConfiguration(settings);
 
       configureSettings(settings);
 
-      var schemaViewsReader = new SchemaViewsReader(settings.ConnectionString, settings.Schema);
-      var edmModel = new EdmObjectChierarchyModelBuilder(schemaViewsReader).GetModel();
+      EdmModel edmModel = settings.Services.EdmModelBuilder(settings).GetModel();
+      IDataService dataService = settings.Services.DataService(settings);
+
+      var routingConventions = ODataRoutingConventions.CreateDefault();
+      routingConventions.Insert(0, new DynamicRoutingConvention());
 
       var oDataRoute = new ODataRoute(
         settings.RoutePrefix,
@@ -50,13 +47,19 @@ namespace DynamicOdata.Service.Owin
           routeName,
           routingConventions));
 
-      IDataService dataService = settings.Services.DataService(settings);
-
       config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(ODataQueryOptions), new ODataQueryOptionsBinder()));
       config.Services.Insert(typeof(ModelBinderProvider),0,new SimpleModelBinderProvider(typeof(HttpRequestMessageProperties), new ODataRequestPropertiesBinder()));
       config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(IDataService), () => new DataServiceBinder(dataService)));
 
       config.Routes.Add(routeName, oDataRoute);
+    }
+
+    private static void BuildDefaultConfiguration(ODataServiceSettings settings)
+    {
+      settings.Services.SchemaReader = s => new SchemaViewsReader(s.ConnectionString, s.Schema);
+      settings.Services.EdmModelBuilder = s => new EdmObjectChierarchyModelBuilder(s.Services.SchemaReader(s));
+      settings.Services.DataService =
+        s => new DataServiceV2(s.ConnectionString, new SqlQueryBuilderWithObjectChierarchy('.'), new RowsToEdmObjectChierarchyResultTransformer('.'));
     }
   }
 }

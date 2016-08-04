@@ -21,5 +21,9 @@ namespace DynamicOdata.Service.Owin
   public class ODataServiceSettingsServices
   {
     public Func<ODataServiceSettings, IDataService> DataService { get; set; }
+
+    public Func<ODataServiceSettings, IEdmModelBuilder> EdmModelBuilder { get; set; }
+
+    public Func<ODataServiceSettings, ISchemaReader> SchemaReader { get; set; }
   }
 }

@@ -4,6 +4,6 @@ namespace DynamicOdata.Service
 {
     public interface IEdmModelBuilder
     {
-        EdmModel GetModel();
+      EdmModel GetModel();
     }
 }

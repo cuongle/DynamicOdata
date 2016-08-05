@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
-      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
@@ -109,6 +105,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>rem Move input dll to input directory
+MKDIR "$(TargetDir)input\"
+MKDIR "$(TargetDir)output\"
+MOVE "$(TargetDir)$(TargetName).*" "$(TargetDir)input\" 
+rem Create a single .dll that combines the root .dll and all subassemblies.
+"$(SolutionDir)..\libs\ilrepack\ilrepack.exe" /out:"$(TargetDir)output\$(TargetName).all.dll" "$(TargetDir)input\$(TargetName).dll" "$(TargetDir)Dapper.dll" "$(TargetDir)Newtonsoft.Json.dll" /target:library /targetplatform:v4,C:\Windows\Microsoft.NET\Framework64\v4.0.30319 /copyattrs /xmldocs /allowdup:"System.Net.Http.HttpRequestMessageExtensions" /allowdup:"System.Net.Http.Formatting.MediaTypeFormatterExtensions"
+rem Remove all subassemblies and pdbs
+del *.* /q
+rem Rename the combined .dll and .pdb to the original project name we started with.
+MOVE "$(TargetDir)output\*.*" "$(TargetDir)"
+ren "$(TargetDir)$(TargetName).all.pdb" "$(TargetName).pdb"
+ren "$(TargetDir)$(TargetName).all.dll" "$(TargetName).dll"
+ren "$(TargetDir)$(TargetName).all.xml" "$(TargetName).xml"
+exit 0</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

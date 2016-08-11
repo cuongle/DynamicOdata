@@ -134,7 +134,23 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       // Assert
       var firstOrDefault = sqlQuery.Parameters.FirstOrDefault(f => (DateTime)f.Value == new DateTime(2016,01,01));
       Assert.NotNull(firstOrDefault);
-      Assert.IsTrue(sqlQuery.Query.Contains($"[{firstOrDefault.Key.Replace('_','.')}] = @{firstOrDefault.Key}"), sqlQuery.Query);
+      var searchableString = $"[{firstOrDefault.Key.Replace('_', '.').Substring(0, firstOrDefault.Key.LastIndexOf('_'))}] = @{firstOrDefault.Key}";
+      Assert.IsTrue(sqlQuery.Query.Contains(searchableString), $"Query => <{sqlQuery.Query}>, searching for = <{searchableString}");
+    }
+
+    [Test]
+    public void ToSql_WhereNameAddedTwoTimesEquals_ReturnsWhereInSql()
+    {
+      // Arrange
+      var oDataQueryOptions = CreateODataQueryOptions($"http://localhost:81/{TestModelBuilder.TestEntityName}?$filter={TestModelBuilder.TestEntityName_NamePropertyName} eq 'xyz' and {TestModelBuilder.TestEntityName_NamePropertyName} eq 'xyz'");
+
+      // Act
+      var sqlQuery = _sut.ToSql(oDataQueryOptions);
+
+      // Assert
+      var firstOrDefault = sqlQuery.Parameters.FirstOrDefault(f => (string)f.Value == "xyz");
+      Assert.NotNull(firstOrDefault);
+      Assert.IsTrue(sqlQuery.Query.Contains($"[{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}"), sqlQuery.Query);
     }
 
     [Test]
@@ -284,7 +300,8 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       // Assert
       var firstOrDefault = sqlQuery.Parameters.FirstOrDefault(f => (DateTime)f.Value == new DateTime(2016, 01, 01));
       Assert.NotNull(firstOrDefault);
-      Assert.IsTrue(sqlQuery.Query.Contains($"[{firstOrDefault.Key.Replace('_', '.')}] = @{firstOrDefault.Key}"), sqlQuery.Query);
+      var searchableString = $"[{firstOrDefault.Key.Replace('_', '.').Substring(0,firstOrDefault.Key.LastIndexOf('_'))}] = @{firstOrDefault.Key}";
+      Assert.IsTrue(sqlQuery.Query.Contains(searchableString), $"Query => <{sqlQuery.Query}>, searching for = <{searchableString}");
       Assert.IsTrue(sqlQuery.Query.ToLower().StartsWith($"select count(*)"), sqlQuery.Query);
     }
 

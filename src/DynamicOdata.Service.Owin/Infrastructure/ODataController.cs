@@ -7,6 +7,7 @@ using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
 using DynamicOdata.Service.Owin.Infrastructure.Binders;
 using Microsoft.Data.Edm;
+using Microsoft.Data.OData.Query;
 
 namespace DynamicOdata.Service.Owin.Infrastructure
 {

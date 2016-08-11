@@ -26,6 +26,7 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
         new EndsWithFunction());
 
       _supportedODataQueryOptions = new ODataValidationSettings();
+
       _supportedODataQueryOptions.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
       _supportedODataQueryOptions.AllowedFunctions = AllowedFunctions.StartsWith
                                                  | AllowedFunctions.EndsWith
@@ -234,7 +235,7 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       paths.Reverse();
 
       var columnName = string.Join(_objectChierarchySeparator.ToString(), paths);
-      var parameterName = string.Join("_", paths);
+      var parameterName = $"{string.Join("_", paths)}_{Guid.NewGuid().ToString("N")}";
       parameters.Add(parameterName, valueNode.Value);
 
       return $"([{columnName}] {operatorString} @{parameterName})";

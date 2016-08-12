@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.OData.Routing;
@@ -12,6 +13,11 @@ namespace DynamicOdata.Service.Owin.Infrastructure
 
     public string SelectAction(ODataPath odataPath, HttpControllerContext controllerContext, ILookup<string, HttpActionDescriptor> actionMap)
     {
+      if (string.Compare(odataPath.Segments.Last().SegmentKind, CountPathSegment.SegmentKindConst, StringComparison.InvariantCultureIgnoreCase) == 0)
+      {
+        return "Count";
+      }
+
       return null;
     }
 

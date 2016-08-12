@@ -14,8 +14,7 @@ namespace DynamicOdata.Service.Owin.Infrastructure.Binders
     {
       var oDataProperties = actionContext.Request.ODataProperties();
       ODataPath path = oDataProperties.Path;
-      var collectionType = path.EdmType as IEdmCollectionType;
-      var entityType = collectionType?.ElementType.Definition as IEdmEntityType;
+      var entityType = path.EntitySet.ElementType;
 
       var queryContext = new ODataQueryContext(oDataProperties.Model, entityType);
       var queryOptions = new ODataQueryOptions(queryContext, actionContext.Request);

@@ -7,12 +7,26 @@ using System.Web.Http.OData.Query;
 using System.Web.Http.OData.Routing;
 using DynamicOdata.Service.Owin.Infrastructure.Binders;
 using Microsoft.Data.Edm;
+using Microsoft.Data.Edm.Library;
 using Microsoft.Data.OData.Query;
 
 namespace DynamicOdata.Service.Owin.Infrastructure
 {
   public class OdataController : System.Web.Http.OData.ODataController
   {
+    [HttpGet]
+    public IHttpActionResult Count(
+      [ModelBinder] ODataQueryOptions queryOptions,
+      [ModelBinder] HttpRequestMessageProperties oDataProperties,
+      [ModelBinder] IDataService dataService)
+    {
+      var edmTypeReference = oDataProperties.Path.EntitySet.ElementType;
+      var edmCollectionType = new EdmCollectionType(new EdmEntityTypeReference(edmTypeReference, true));
+
+      var count = dataService.Count(edmCollectionType, queryOptions);
+      return new OkStringContentResult(this, count.ToString());
+    }
+
     public EdmEntityObjectCollection Get(
       [ModelBinder] ODataQueryOptions queryOptions,
       [ModelBinder] HttpRequestMessageProperties oDataProperties,

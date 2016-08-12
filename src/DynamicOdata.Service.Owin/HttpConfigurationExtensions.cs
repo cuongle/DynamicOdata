@@ -42,7 +42,7 @@ namespace DynamicOdata.Service.Owin
       var oDataRoute = new ODataRoute(
         settings.RoutePrefix,
         new CustomODataPathRouteConstraint(
-          new DefaultODataPathHandler(),
+          new CustomODataPathHandler(),
           _ => edmModel,
           routeName,
           routingConventions));

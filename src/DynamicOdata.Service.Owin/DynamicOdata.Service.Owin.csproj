@@ -74,10 +74,13 @@
     <Compile Include="HttpConfigurationExtensions.cs" />
     <Compile Include="Infrastructure\Binders\ODataQueryOptionsBinder.cs" />
     <Compile Include="Infrastructure\Binders\ODataRequestPropertiesBinder.cs" />
+    <Compile Include="Infrastructure\CustomODataPathHandler.cs" />
+    <Compile Include="Infrastructure\CountPathSegment.cs" />
     <Compile Include="Infrastructure\CustomODataPathRouteConstraint.cs" />
     <Compile Include="Infrastructure\DynamicRoutingConvention.cs" />
     <Compile Include="Infrastructure\ODataController.cs" />
     <Compile Include="Infrastructure\DynamicOdataMetadataController.cs" />
+    <Compile Include="Infrastructure\OkStringContentResult.cs" />
     <Compile Include="ODataServiceSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

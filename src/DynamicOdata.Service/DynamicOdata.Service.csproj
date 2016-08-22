@@ -106,18 +106,22 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rem Move input dll to input directory
+    <PostBuildEvent>echo on
+echo Move input dll to input directory
 MKDIR "$(TargetDir)input\"
 MKDIR "$(TargetDir)output\"
-MOVE "$(TargetDir)$(TargetName).*" "$(TargetDir)input\" 
-rem Create a single .dll that combines the root .dll and all subassemblies.
-"$(SolutionDir)..\libs\ilrepack\ilrepack.exe" /out:"$(TargetDir)output\$(TargetName).dll" "$(TargetDir)input\$(TargetName).dll" "$(TargetDir)Dapper.dll" "$(TargetDir)Newtonsoft.Json.dll" /target:library /targetplatform:v4,C:\Windows\Microsoft.NET\Framework64\v4.0.30319 /copyattrs /xmldocs /allowdup:"System.Net.Http.HttpRequestMessageExtensions" /allowdup:"System.Net.Http.Formatting.MediaTypeFormatterExtensions"
-rem Remove all subassemblies and pdbs
-del *.* /q
-rem Rename the combined .dll and .pdb to the original project name we started with.
+MOVE "$(TargetDir)$(TargetName).*" "$(TargetDir)input\"
+echo ------------- Create a single .dll that combines the root .dll and all subassemblies.------------- 
+"$(SolutionDir)..\libs\ilrepack\ilrepack.exe" /out:"$(TargetDir)output\$(TargetName).dll" "$(TargetDir)input\$(TargetName).dll" "$(TargetDir)Dapper.dll" "$(TargetDir)System.Net.Http.Formatting.dll" "$(TargetDir)Newtonsoft.Json.dll" "$(TargetDir)System.Web.Http.dll" /target:library /targetplatform:v4,C:\Windows\Microsoft.NET\Framework64\v4.0.30319 /copyattrs /allowdup:"System.Net.Http.HttpRequestMessageExtensions" /allowdup:"System.Net.Http.Formatting.MediaTypeFormatterExtensions" /internalize /xmldocs
+echo ------------- Remove all subassemblies and pdbs------------- 
+rem del *.* /q
+echo ------------- Rename the combined .dll and .pdb to the original project name we started with.------------- 
 MOVE "$(TargetDir)output\*.*" "$(TargetDir)"
+echo ------------- renaming pdbs------------- 
 ren "$(TargetDir)$(TargetName).pdb" "$(TargetName).pdb"
+echo ------------- renaming dlls------------- 
 ren "$(TargetDir)$(TargetName).dll" "$(TargetName).dll"
+echo ------------- renaming xmls------------- 
 ren "$(TargetDir)$(TargetName).xml" "$(TargetName).xml"
 exit 0</PostBuildEvent>
   </PropertyGroup>

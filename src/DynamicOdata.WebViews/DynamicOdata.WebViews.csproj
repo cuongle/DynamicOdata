@@ -107,6 +107,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\SampleDatabase\SampleDatabase.mdf">
+      <Link>App_Data\SampleDatabase.mdf</Link>
+    </Content>
+    <Content Include="..\SampleDatabase\SampleDatabase_log.ldf">
+      <Link>App_Data\SampleDatabase_log.ldf</Link>
+    </Content>
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
   </ItemGroup>
@@ -128,9 +134,7 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\DynamicOdata.Service.Owin\DynamicOdata.Service.Owin.csproj">
       <Project>{B3D440BD-A762-4082-BF20-200E1EC87473}</Project>

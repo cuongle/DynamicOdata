@@ -8,17 +8,17 @@ using Microsoft.Data.Edm.Library;
 
 namespace DynamicOdata.Service.Impl.ResultTransformers
 {
-  public class RowsToEdmObjectChierarchyResultTransformer : IResultTransformer
+  public class RowsToEdmObjectHierarchyResultTransformer : IResultTransformer
   {
     private static readonly ConcurrentDictionary<string, Dictionary<string, ComponentHelpClass>> EntityTypeToColumnsMap;
     private readonly char _separator;
 
-    static RowsToEdmObjectChierarchyResultTransformer()
+    static RowsToEdmObjectHierarchyResultTransformer()
     {
       EntityTypeToColumnsMap = new ConcurrentDictionary<string, Dictionary<string, ComponentHelpClass>>();
     }
 
-    public RowsToEdmObjectChierarchyResultTransformer(char treeSeparator)
+    public RowsToEdmObjectHierarchyResultTransformer(char treeSeparator)
     {
       if (treeSeparator <= 0)
       {

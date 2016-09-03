@@ -80,14 +80,14 @@
     <Compile Include="Impl\EdmBuilders\EdmModelBuilder.cs" />
     <Compile Include="IDataService.cs" />
     <Compile Include="IEdmModelBuilder.cs" />
-    <Compile Include="Impl\EdmBuilders\EdmObjectChierarchyModelBuilder.cs" />
+    <Compile Include="Impl\EdmBuilders\EdmObjectHierarchyModelBuilder.cs" />
     <Compile Include="Impl\SqlBuilders\EndsWithFunction.cs" />
     <Compile Include="Impl\SqlBuilders\IFunctionParser.cs" />
     <Compile Include="Impl\SqlBuilders\StartsWithFunction.cs" />
     <Compile Include="Impl\SqlBuilders\SubstringOfFunction.cs" />
     <Compile Include="Impl\SqlBuilders\SupportedODataQueryOptions.cs" />
     <Compile Include="IResultTransformer.cs" />
-    <Compile Include="Impl\ResultTransformers\RowsToEdmObjectChierarchyResultTransformer.cs" />
+    <Compile Include="Impl\ResultTransformers\RowsToEdmObjectHierarchyResultTransformer.cs" />
     <Compile Include="Impl\SchemaReaders\SchemaViewsReader.cs" />
     <Compile Include="Impl\SchemaReaders\SchemaReader.cs" />
     <Compile Include="ISqlQueryBuilder.cs" />
@@ -97,7 +97,7 @@
     <Compile Include="Models\TableInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Impl\SqlBuilders\SqlQuery.cs" />
-    <Compile Include="Impl\SqlBuilders\SqlQueryBuilderWithObjectChierarchy.cs" />
+    <Compile Include="Impl\SqlBuilders\SqlQueryBuilderWithObjectHierarchy.cs" />
     <Compile Include="Impl\SqlBuilders\SqlQueryBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -112,7 +112,7 @@ MKDIR "$(TargetDir)input\"
 MKDIR "$(TargetDir)output\"
 MOVE "$(TargetDir)$(TargetName).*" "$(TargetDir)input\"
 echo ------------- Create a single .dll that combines the root .dll and all subassemblies.------------- 
-"$(SolutionDir)..\libs\ilrepack\ilrepack.exe" /out:"$(TargetDir)output\$(TargetName).dll" "$(TargetDir)input\$(TargetName).dll" "$(TargetDir)Dapper.dll" "$(TargetDir)System.Net.Http.Formatting.dll" "$(TargetDir)Newtonsoft.Json.dll" "$(TargetDir)System.Web.Http.dll" /target:library /targetplatform:v4,C:\Windows\Microsoft.NET\Framework64\v4.0.30319 /copyattrs /allowdup:"System.Net.Http.HttpRequestMessageExtensions" /allowdup:"System.Net.Http.Formatting.MediaTypeFormatterExtensions" /internalize /xmldocs
+"$(SolutionDir)..\libs\ilrepack\ilrepack.exe" /out:"$(TargetDir)output\$(TargetName).dll" "$(TargetDir)input\$(TargetName).dll" "$(TargetDir)Dapper.dll" "$(TargetDir)System.Net.Http.Formatting.dll" /target:library /targetplatform:v4,C:\Windows\Microsoft.NET\Framework64\v4.0.30319 /copyattrs /allowdup:"System.Net.Http.HttpRequestMessageExtensions" /allowdup:"System.Net.Http.Formatting.MediaTypeFormatterExtensions" /internalize /xmldocs
 echo ------------- Remove all subassemblies and pdbs------------- 
 rem del *.* /q
 echo ------------- Rename the combined .dll and .pdb to the original project name we started with.------------- 

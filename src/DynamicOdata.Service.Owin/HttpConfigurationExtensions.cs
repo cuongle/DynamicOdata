@@ -48,7 +48,7 @@ namespace DynamicOdata.Service.Owin
           routingConventions));
 
       config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(ODataQueryOptions), new ODataQueryOptionsBinder()));
-      config.Services.Insert(typeof(ModelBinderProvider),0,new SimpleModelBinderProvider(typeof(HttpRequestMessageProperties), new ODataRequestPropertiesBinder()));
+      config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(HttpRequestMessageProperties), new ODataRequestPropertiesBinder()));
       config.Services.Insert(typeof(ModelBinderProvider), 0, new SimpleModelBinderProvider(typeof(IDataService), () => new DataServiceBinder(dataService)));
 
       config.Routes.Add(routeName, oDataRoute);
@@ -57,9 +57,9 @@ namespace DynamicOdata.Service.Owin
     private static void BuildDefaultConfiguration(ODataServiceSettings settings)
     {
       settings.Services.SchemaReader = s => new SchemaViewsReader(s.ConnectionString, s.Schema);
-      settings.Services.EdmModelBuilder = s => new EdmObjectChierarchyModelBuilder(s.Services.SchemaReader(s));
+      settings.Services.EdmModelBuilder = s => new EdmObjectHierarchyModelBuilder(s.Services.SchemaReader(s));
       settings.Services.DataService =
-        s => new DataServiceV2(s.ConnectionString, new SqlQueryBuilderWithObjectChierarchy('.'), new RowsToEdmObjectChierarchyResultTransformer('.'));
+        s => new DataServiceV2(s.ConnectionString, new SqlQueryBuilderWithObjectHierarchy('.'), new RowsToEdmObjectHierarchyResultTransformer('.'));
     }
   }
 }

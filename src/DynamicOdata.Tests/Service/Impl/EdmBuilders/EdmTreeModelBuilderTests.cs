@@ -16,7 +16,7 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
   public class EdmTreeModelBuilderTests
   {
     [Test]
-    public void GetModel_DottedChierarchyColumns_ShouldBeNotBeMixedWithOtherTableComponents()
+    public void GetModel_DottedHierarchyColumns_ShouldBeNotBeMixedWithOtherTableComponents()
     {
       // Arrange
       var mock = new Mock<ISchemaReader>();
@@ -46,7 +46,7 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
       mock.Setup(s => s.GetTables(It.IsAny<IEnumerable<TableInfo>>())).Returns(tables);
 
       // Act
-      var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(mock.Object);
+      var edmTreeModelBuilder = new EdmObjectHierarchyModelBuilder(mock.Object);
       var edmModel = edmTreeModelBuilder.GetModel();
 
       // Assert
@@ -96,7 +96,7 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
       mock.Setup(s => s.GetTables(It.IsAny<IEnumerable<TableInfo>>())).Returns(tables);
 
       // Act
-      var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(mock.Object);
+      var edmTreeModelBuilder = new EdmObjectHierarchyModelBuilder(mock.Object);
       var edmModel = edmTreeModelBuilder.GetModel();
 
       // Assert
@@ -132,7 +132,7 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
       mock.Setup(s => s.GetTables(It.IsAny<IEnumerable<TableInfo>>())).Returns(tables);
 
       // Act
-      var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(mock.Object);
+      var edmTreeModelBuilder = new EdmObjectHierarchyModelBuilder(mock.Object);
       var edmModel = edmTreeModelBuilder.GetModel();
 
       // Assert
@@ -145,7 +145,7 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
     }
 
     [Test]
-    public void GetModel_SingleTableWithDottedChierarchy_EdmWithNestedComplexTypesIsGenerated()
+    public void GetModel_SingleTableWithDottedHierarchy_EdmWithNestedComplexTypesIsGenerated()
     {
       // Arrange
       var mock = new Mock<ISchemaReader>();
@@ -175,7 +175,7 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
       mock.Setup(s => s.GetTables(It.IsAny<IEnumerable<TableInfo>>())).Returns(tables);
 
       // Act
-      var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(mock.Object);
+      var edmTreeModelBuilder = new EdmObjectHierarchyModelBuilder(mock.Object);
       var edmModel = edmTreeModelBuilder.GetModel();
 
       // Assert
@@ -205,8 +205,8 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
       // Arrange
       var mock = new Mock<ISchemaReader>();
       var tableName = "x";
-      var secondColumn = new DatabaseColumn {Name = "SecondName", IsPrimaryKey = false, DataType = "nvarchar", Nullable = false, Table = tableName, Schema = "dbo"};
-      var firstColumn = new DatabaseColumn {Name = "FirstName", IsPrimaryKey = false, DataType = "nvarchar", Nullable = false, Table = tableName, Schema = "dbo"};
+      var secondColumn = new DatabaseColumn { Name = "SecondName", IsPrimaryKey = false, DataType = "nvarchar", Nullable = false, Table = tableName, Schema = "dbo" };
+      var firstColumn = new DatabaseColumn { Name = "FirstName", IsPrimaryKey = false, DataType = "nvarchar", Nullable = false, Table = tableName, Schema = "dbo" };
 
       DatabaseTable[] tables = {
         new DatabaseTable()
@@ -224,7 +224,7 @@ namespace DynamicOdata.Tests.Service.Impl.EdmBuilders
       mock.Setup(s => s.GetTables(It.IsAny<IEnumerable<TableInfo>>())).Returns(tables);
 
       // Act
-      var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(mock.Object);
+      var edmTreeModelBuilder = new EdmObjectHierarchyModelBuilder(mock.Object);
       var edmModel = edmTreeModelBuilder.GetModel();
 
       // Assert

@@ -102,7 +102,7 @@ MKDIR "$(TargetDir)input\"
 MKDIR "$(TargetDir)output\"
 MOVE "$(TargetDir)$(TargetName).*" "$(TargetDir)input\"
 echo ------------- Create a single .dll that combines the root .dll and all subassemblies.------------- 
-"$(SolutionDir)..\libs\ilrepack\ilrepack.exe" /out:"$(TargetDir)output\$(TargetName).dll" "$(TargetDir)input\$(TargetName).dll" "$(TargetDir)System.Net.Http.Formatting.dll" "$(TargetDir)System.Web.Http.dll" /target:library /targetplatform:v4,C:\Windows\Microsoft.NET\Framework64\v4.0.30319 /copyattrs /allowdup:"System.Net.Http.HttpRequestMessageExtensions" /allowdup:"System.Net.Http.Formatting.MediaTypeFormatterExtensions" /internalize /xmldocs
+"$(SolutionDir)..\libs\ilrepack\ilrepack.exe" /out:"$(TargetDir)output\$(TargetName).dll" "$(TargetDir)input\$(TargetName).dll" "$(TargetDir)System.Net.Http.Formatting.dll"  /target:library /targetplatform:v4,C:\Windows\Microsoft.NET\Framework64\v4.0.30319 /copyattrs /allowdup:"System.Net.Http.HttpRequestMessageExtensions" /allowdup:"System.Net.Http.Formatting.MediaTypeFormatterExtensions" /internalize /xmldocs
 echo ------------- Copy DynamicOdata.Service------------- 
 MOVE "$(TargetDir)DynamicOdata.Service.*" "$(TargetDir)output\"
 echo ------------- Remove all subassemblies and pdbs------------- 

@@ -14,15 +14,15 @@ using NUnit.Framework;
 namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
 {
   [TestFixture]
-  public class SqlQueryBuilderWithObjectChierarchyTests
+  public class SqlQueryBuilderWithObjectHierarchyTests
   {
     private ODataQueryContext _oDataQueryContext;
-    private SqlQueryBuilderWithObjectChierarchy _sut;
+    private SqlQueryBuilderWithObjectHierarchy _sut;
 
     [TestFixtureSetUp]
     public void OneTimeSetUp()
     {
-      _sut = new SqlQueryBuilderWithObjectChierarchy('.');
+      _sut = new SqlQueryBuilderWithObjectHierarchy('.');
 
       var edmModel = TestModelBuilder.BuildModel();
       var edmSchemaType = edmModel.SchemaElements.FirstOrDefault(w => w.Name == TestModelBuilder.TestEntityName) as IEdmSchemaType;
@@ -30,7 +30,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
     }
 
     [Test]
-    public void ToSql_OrderByChierarchicalNamePassed_ItIsReplacedInSql()
+    public void ToSql_OrderByHierarchicalNamePassed_ItIsReplacedInSql()
     {
       // Arrange
       string fieldName = $"{TestModelBuilder.TestEntityName_AgreementsTypeName}/{TestModelBuilder.TestEntityName_AgreementsTypeName_MarketingagreementTypeName}/{TestModelBuilder.TestEntityName_AgreementsTypeName_MarketingagreementTypeName_AcceptanceDatePropertyName}";
@@ -40,7 +40,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       var sqlQuery = _sut.ToSql(oDataQueryOptions);
 
       // Assert
-      Assert.IsTrue(sqlQuery.Query.EndsWith($"order by [{fieldName.Replace("/",".")}] desc", StringComparison.InvariantCultureIgnoreCase));
+      Assert.IsTrue(sqlQuery.Query.EndsWith($"order by [{fieldName.Replace("/", ".")}] desc", StringComparison.InvariantCultureIgnoreCase));
     }
 
     [Test]
@@ -122,7 +122,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
     }
 
     [Test]
-    public void ToSql_WhereChierarchicalNamePassed_ItIsReplacedInSql()
+    public void ToSql_WhereHierarchicalNamePassed_ItIsReplacedInSql()
     {
       // Arrange
       string fieldName = $"{TestModelBuilder.TestEntityName_AgreementsTypeName}/{TestModelBuilder.TestEntityName_AgreementsTypeName_MarketingagreementTypeName}/{TestModelBuilder.TestEntityName_AgreementsTypeName_MarketingagreementTypeName_AcceptanceDatePropertyName}";
@@ -132,7 +132,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       var sqlQuery = _sut.ToSql(oDataQueryOptions);
 
       // Assert
-      var firstOrDefault = sqlQuery.Parameters.FirstOrDefault(f => (DateTime)f.Value == new DateTime(2016,01,01));
+      var firstOrDefault = sqlQuery.Parameters.FirstOrDefault(f => (DateTime)f.Value == new DateTime(2016, 01, 01));
       Assert.NotNull(firstOrDefault);
       var searchableString = $"[{firstOrDefault.Key.Replace('_', '.').Substring(0, firstOrDefault.Key.LastIndexOf('_'))}] = @{firstOrDefault.Key}";
       Assert.IsTrue(sqlQuery.Query.Contains(searchableString), $"Query => <{sqlQuery.Query}>, searching for = <{searchableString}");
@@ -288,7 +288,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
     }
 
     [Test]
-    public void ToSqlCount_WhereChierarchicalNamePassed_ItIsReplacedInSql()
+    public void ToSqlCount_WhereHierarchicalNamePassed_ItIsReplacedInSql()
     {
       // Arrange
       string fieldName = $"{TestModelBuilder.TestEntityName_AgreementsTypeName}/{TestModelBuilder.TestEntityName_AgreementsTypeName_MarketingagreementTypeName}/{TestModelBuilder.TestEntityName_AgreementsTypeName_MarketingagreementTypeName_AcceptanceDatePropertyName}";
@@ -300,7 +300,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       // Assert
       var firstOrDefault = sqlQuery.Parameters.FirstOrDefault(f => (DateTime)f.Value == new DateTime(2016, 01, 01));
       Assert.NotNull(firstOrDefault);
-      var searchableString = $"[{firstOrDefault.Key.Replace('_', '.').Substring(0,firstOrDefault.Key.LastIndexOf('_'))}] = @{firstOrDefault.Key}";
+      var searchableString = $"[{firstOrDefault.Key.Replace('_', '.').Substring(0, firstOrDefault.Key.LastIndexOf('_'))}] = @{firstOrDefault.Key}";
       Assert.IsTrue(sqlQuery.Query.Contains(searchableString), $"Query => <{sqlQuery.Query}>, searching for = <{searchableString}");
       Assert.IsTrue(sqlQuery.Query.ToLower().StartsWith($"select count(*)"), sqlQuery.Query);
     }

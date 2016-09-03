@@ -12,18 +12,18 @@ using NUnit.Framework;
 namespace DynamicOdata.Tests.Service.Impl.ResultTransformers
 {
   [TestFixture]
-  public class RowsToEdmObjectChierarchyResultTransformerTests
+  public class RowsToEdmObjectHierarchyResultTransformerTests
   {
-    private RowsToEdmObjectChierarchyResultTransformer _sut;
+    private RowsToEdmObjectHierarchyResultTransformer _sut;
 
     [SetUp]
     public void OneTimeSetUp()
     {
-      _sut = new RowsToEdmObjectChierarchyResultTransformer('.');
+      _sut = new RowsToEdmObjectHierarchyResultTransformer('.');
     }
 
     [Test]
-    public void Translate_EnumerableOfRows_ReturnChierarchicalObject()
+    public void Translate_EnumerableOfRows_ReturnHierarchicalObject()
     {
       // Arrange
       DateTime acceptanceDateSet = DateTime.Now;
@@ -55,7 +55,7 @@ namespace DynamicOdata.Tests.Service.Impl.ResultTransformers
     }
 
     [Test]
-    public void Translate_SingleRow_ReturnChierarchicalObject()
+    public void Translate_SingleRow_ReturnHierarchicalObject()
     {
       // Arrange
       DateTime acceptanceDateSet = DateTime.Now;

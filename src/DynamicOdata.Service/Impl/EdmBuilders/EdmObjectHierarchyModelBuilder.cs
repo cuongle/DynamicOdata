@@ -9,18 +9,18 @@ using Microsoft.Data.Edm.Library;
 
 namespace DynamicOdata.Service.Impl.EdmBuilders
 {
-  public class EdmObjectChierarchyModelBuilder : IEdmModelBuilder
+  public class EdmObjectHierarchyModelBuilder : IEdmModelBuilder
   {
     private readonly PluralizationService _pluralizationService;
     private readonly ISchemaReader _schemaReader;
     private readonly char _separator;
 
-    public EdmObjectChierarchyModelBuilder(ISchemaReader schemaReader)
+    public EdmObjectHierarchyModelBuilder(ISchemaReader schemaReader)
       : this(schemaReader, '.')
     {
     }
 
-    public EdmObjectChierarchyModelBuilder(ISchemaReader schemaReader, char separator)
+    public EdmObjectHierarchyModelBuilder(ISchemaReader schemaReader, char separator)
     {
       if (schemaReader == null)
       {
@@ -100,7 +100,8 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
         typeKind = typeMap[column.DataType];
       }
 
-      return entity.AddStructuralProperty(column.Name, typeKind, column.Nullable);
+      //// because of posibility of changing column table nullability from which view is generated we always set nullable to TRUE. Then it is prepared for null value.
+      return entity.AddStructuralProperty(column.Name, typeKind, true);
     }
 
     private static IDictionary<string, EdmPrimitiveTypeKind> BuildEdmTypeMap()
@@ -169,7 +170,7 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
 
     private IEnumerable<ComponentInfo> BuildComponentMap(string entityName, string prefix, IEnumerable<DatabaseColumn> columns, int iteration = 0)
     {
-      List<ComponentInfo> componentInfos  = new List<ComponentInfo>();
+      List<ComponentInfo> componentInfos = new List<ComponentInfo>();
 
       var groupBy = columns.GroupBy(g => g.Name.Split(_separator)[iteration]);
 
@@ -180,7 +181,7 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
 
         var actualGroupPrefix = $"{prefix}{g.Key}{_separator}";
         var actualLvlColumns = g
-          .Select(s => new {Name = s.Name.Remove(0, (actualGroupPrefix).Length), Column = s})
+          .Select(s => new { Name = s.Name.Remove(0, (actualGroupPrefix).Length), Column = s })
           .ToList();
 
         componentInfo.Columns = actualLvlColumns.Where(w => !w.Name.Contains(_separator)).Select(s => s.Column);
@@ -211,11 +212,11 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
 
     private class ComponentInfo
     {
-      public IEnumerable<ComponentInfo> ChildComponents { get;  set; }
+      public IEnumerable<ComponentInfo> ChildComponents { get; set; }
 
-      public IEnumerable<DatabaseColumn> Columns { get;  set; }
+      public IEnumerable<DatabaseColumn> Columns { get; set; }
 
-      public string Name { get;  set; }
+      public string Name { get; set; }
     }
   }
 }

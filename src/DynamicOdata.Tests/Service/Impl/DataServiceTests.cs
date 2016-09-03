@@ -28,8 +28,8 @@ namespace DynamicOdata.Tests.Service.Impl
 
       string databaseConnStr = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|TestDatabase.mdf;Integrated Security=True";
 
-      var dataService = new DataServiceV2(databaseConnStr, new SqlQueryBuilderWithObjectChierarchy('.'), new RowsToEdmObjectChierarchyResultTransformer('.') );
-      var edmTreeModelBuilder = new EdmObjectChierarchyModelBuilder(new SchemaViewsReader(databaseConnStr, "dbo"));
+      var dataService = new DataServiceV2(databaseConnStr, new SqlQueryBuilderWithObjectHierarchy('.'), new RowsToEdmObjectHierarchyResultTransformer('.'));
+      var edmTreeModelBuilder = new EdmObjectHierarchyModelBuilder(new SchemaViewsReader(databaseConnStr, "dbo"));
       var edmModel = edmTreeModelBuilder.GetModel();
       var edmSchemaType = edmModel.FindType("dbo.Case2Obligation");
       var edmCollectionType = edmModel.FindDeclaredEntityContainer("container").FindEntitySet("Case2Obligation");
@@ -39,7 +39,7 @@ namespace DynamicOdata.Tests.Service.Impl
 
       var oDataQueryOptions = new ODataQueryOptions(oDataQueryContext, message);
       oDataQueryOptions.Validate(new ODataValidationSettings());
-      var collectionType =  (IEdmCollectionType)new EdmCollectionType((IEdmTypeReference)new EdmEntityTypeReference(edmCollectionType.ElementType, false));
+      var collectionType = (IEdmCollectionType)new EdmCollectionType((IEdmTypeReference)new EdmEntityTypeReference(edmCollectionType.ElementType, false));
       var edmEntityObjectCollection = dataService.Get(collectionType, oDataQueryOptions);
 
       // Act

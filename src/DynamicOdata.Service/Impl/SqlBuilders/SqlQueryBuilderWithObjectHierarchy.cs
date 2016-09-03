@@ -10,13 +10,13 @@ using Microsoft.Data.OData.Query.SemanticAst;
 
 namespace DynamicOdata.Service.Impl.SqlBuilders
 {
-  public class SqlQueryBuilderWithObjectChierarchy : ISqlQueryBuilder
+  public class SqlQueryBuilderWithObjectHierarchy : ISqlQueryBuilder
   {
     private static readonly Dictionary<string, IFunctionParser> FunctionsParsers;
     private static ODataValidationSettings _supportedODataQueryOptions;
-    private readonly char _objectChierarchySeparator;
+    private readonly char _objectHierarchySeparator;
 
-    static SqlQueryBuilderWithObjectChierarchy()
+    static SqlQueryBuilderWithObjectHierarchy()
     {
       FunctionsParsers = new Dictionary<string, IFunctionParser>();
 
@@ -39,14 +39,14 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
                                                     | AllowedQueryOptions.Top;
     }
 
-    public SqlQueryBuilderWithObjectChierarchy(char objectChierarchySeparator)
+    public SqlQueryBuilderWithObjectHierarchy(char objectHierarchySeparator)
     {
-      if (objectChierarchySeparator <= 0)
+      if (objectHierarchySeparator <= 0)
       {
-        throw new ArgumentOutOfRangeException(nameof(objectChierarchySeparator));
+        throw new ArgumentOutOfRangeException(nameof(objectHierarchySeparator));
       }
 
-      _objectChierarchySeparator = objectChierarchySeparator;
+      _objectHierarchySeparator = objectHierarchySeparator;
     }
 
     public static ODataValidationSettings GetSupportedODataQueryOptions()
@@ -135,7 +135,7 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
           s =>
           {
             var columnToOrder = s.Trim().Split(' ');
-            string outputOrder = $"[{columnToOrder[0].Replace('/', _objectChierarchySeparator)}]";
+            string outputOrder = $"[{columnToOrder[0].Replace('/', _objectHierarchySeparator)}]";
 
             outputOrder += columnToOrder.Count() > 1 ? $" {columnToOrder[1]}" : string.Empty;
 
@@ -234,7 +234,7 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
 
       paths.Reverse();
 
-      var columnName = string.Join(_objectChierarchySeparator.ToString(), paths);
+      var columnName = string.Join(_objectHierarchySeparator.ToString(), paths);
       var parameterName = $"{string.Join("_", paths)}_{Guid.NewGuid().ToString("N")}";
       parameters.Add(parameterName, valueNode.Value);
 

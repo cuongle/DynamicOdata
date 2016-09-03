@@ -7,8 +7,9 @@ using Microsoft.Owin.Hosting;
 
 namespace DynamicOdata.SelfHost
 {
-  internal class Program
+  public class Program
   {
+    [STAThread]
     private static void Main(string[] args)
     {
       using (WebApp.Start<StartupOwin>("http://localhost:9000"))

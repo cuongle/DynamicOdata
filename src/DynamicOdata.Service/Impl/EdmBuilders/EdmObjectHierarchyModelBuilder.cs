@@ -11,7 +11,6 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
 {
   public class EdmObjectHierarchyModelBuilder : IEdmModelBuilder
   {
-    private readonly PluralizationService _pluralizationService;
     private readonly ISchemaReader _schemaReader;
     private readonly char _separator;
 
@@ -33,7 +32,6 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
       }
 
       _schemaReader = schemaReader;
-      _pluralizationService = PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-US"));
       _separator = separator;
     }
 
@@ -56,7 +54,7 @@ namespace DynamicOdata.Service.Impl.EdmBuilders
         var entity = CreateEdmEntity(table, model);
 
         model.AddElement(entity);
-        container.AddEntitySet(_pluralizationService.Pluralize(table.Name), entity);
+        container.AddEntitySet(table.Name, entity);
       }
 
       return model;

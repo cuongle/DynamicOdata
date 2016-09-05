@@ -210,7 +210,7 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
 
       if (valueNode.Value == null)
       {
-        if (operatorKind != BinaryOperatorKind.Equal || operatorKind != BinaryOperatorKind.NotEqual)
+        if (operatorKind != BinaryOperatorKind.Equal && operatorKind != BinaryOperatorKind.NotEqual)
         {
           throw new ArgumentException($"Value of property [{propertyNode.Property.Name}] is set to NULL value. It will not work...");
         }

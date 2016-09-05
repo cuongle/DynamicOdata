@@ -288,6 +288,20 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
     }
 
     [Test]
+    public void ToSql_WhereValueEqualNull_ReturnsWhereInSql()
+    {
+      // Arrange
+      var oDataQueryOptions = CreateODataQueryOptions($"http://localhost:81/{TestModelBuilder.TestEntityName}?$filter={TestModelBuilder.TestEntityName_NamePropertyName} eq null");
+
+      // Act
+      var sqlQuery = _sut.ToSql(oDataQueryOptions);
+
+      // Assert
+      Assert.IsEmpty(sqlQuery.Parameters);
+      Assert.IsTrue(sqlQuery.Query.Contains($"[{TestModelBuilder.TestEntityName_NamePropertyName}] IS NULL"), sqlQuery.Query);
+    }
+
+    [Test]
     public void ToSqlCount_WhereHierarchicalNamePassed_ItIsReplacedInSql()
     {
       // Arrange

@@ -33,7 +33,7 @@ namespace DynamicOdata.SelfHost
         config,
         oDataServiceSettings =>
         {
-          oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["default"].ConnectionString;
+          oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["first"].ConnectionString;
           oDataServiceSettings.RoutePrefix = "odata";
           oDataServiceSettings.Schema = "dbo";
 
@@ -41,6 +41,20 @@ namespace DynamicOdata.SelfHost
           ////
           //// oDataServiceSettings.Services.DataService = s => new DataServiceDecorator(s.Services.DataService(s));
         });
+
+      app.UseDynamicOData(
+        config,
+        oDataServiceSettings =>
+        {
+          oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["second"].ConnectionString;
+          oDataServiceSettings.RoutePrefix = "odata2";
+          oDataServiceSettings.Schema = "dbo";
+
+          //// extension point for replacing data service - by Default instance does not need to be set up
+          ////
+          //// oDataServiceSettings.Services.DataService = s => new DataServiceDecorator(s.Services.DataService(s));
+        });
+
       app.UseWebApi(config);
     }
   }

@@ -16,14 +16,17 @@ namespace DynamicOdata.Service.Owin.Infrastructure
   internal class CustomODataPathRouteConstraint : ODataPathRouteConstraint
   {
     private static readonly string _escapedSlash = Uri.HexEscape('/');
+    private readonly IDataService _dataService;
 
     public CustomODataPathRouteConstraint(
       IODataPathHandler pathHandler,
       Func<HttpRequestMessage, IEdmModel> modelProvider,
       string routeName,
-      IEnumerable<IODataRoutingConvention> routingConventions)
+      IEnumerable<IODataRoutingConvention> routingConventions,
+      IDataService dataService)
       : base(pathHandler, new EdmModel(), routeName, routingConventions)
     {
+      _dataService = dataService;
       EdmModelProvider = modelProvider;
     }
 
@@ -90,6 +93,7 @@ namespace DynamicOdata.Service.Owin.Infrastructure
       odataProperties.Path = path;
       odataProperties.RouteName = RouteName;
       odataProperties.RoutingConventions = RoutingConventions;
+      values.Add(typeof(IDataService).FullName, _dataService);
 
       if (values.ContainsKey(ODataRouteConstants.Controller))
       {

@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,7 +25,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -151,11 +151,19 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\SampleDatabase\SampleDatabase.mdf">
-      <Link>SampleDatabase.mdf</Link>
+      <Link>App_data\SampleDatabase.mdf</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SampleDatabase\SampleDatabase2.mdf">
+      <Link>App_data\SampleDatabase2.mdf</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\SampleDatabase\SampleDatabase2_log.ldf">
+      <Link>App_data\SampleDatabase2_log.ldf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\SampleDatabase\SampleDatabase_log.ldf">
-      <Link>SampleDatabase_log.ldf</Link>
+      <Link>App_data\SampleDatabase_log.ldf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

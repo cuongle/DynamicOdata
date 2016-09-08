@@ -30,7 +30,7 @@ sddsfdwefew
 
 ## **Option 2 -  Advanced data query with hierarchical data models read from views**
 
-This option is made for OWIN servers. Functionality of this module is to read views in specified database schema. When views are created with some convention it returns hierarchical models. 
+This option is made for OWIN servers. Functionality of this module is to read views in specified database schema. When views are created with some convention it returns hierarchical models. It is possible to register many databases on diffrent `RoutePrefix`. 
 
 ### Simple scenario
 

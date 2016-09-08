@@ -20,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SampleDatabase", "SampleDatabase", "{001B4C22-FAF1-47E8-A2B8-4ACBA7F3BCF0}"
 	ProjectSection(SolutionItems) = preProject
 		SampleDatabase\SampleDatabase.mdf = SampleDatabase\SampleDatabase.mdf
+		SampleDatabase\SampleDatabase2.ldf = SampleDatabase\SampleDatabase2.ldf
+		SampleDatabase\SampleDatabase2.mdf = SampleDatabase\SampleDatabase2.mdf
 		SampleDatabase\SampleDatabase_log.ldf = SampleDatabase\SampleDatabase_log.ldf
 	EndProjectSection
 EndProject

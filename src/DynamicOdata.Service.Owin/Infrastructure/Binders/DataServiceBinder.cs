@@ -7,21 +7,11 @@ namespace DynamicOdata.Service.Owin.Infrastructure.Binders
 {
   internal class DataServiceBinder : IModelBinder
   {
-    private readonly IDataService _dataService;
-
-    public DataServiceBinder(IDataService dataService)
-    {
-      if (dataService == null)
-      {
-        throw new ArgumentNullException(nameof(dataService));
-      }
-
-      _dataService = dataService;
-    }
-
     public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
     {
-      bindingContext.Model = _dataService;
+      object dataService;
+      actionContext.RequestContext.RouteData.Values.TryGetValue(typeof(IDataService).FullName, out dataService);
+      bindingContext.Model = dataService;
 
       return true;
     }

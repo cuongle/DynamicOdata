@@ -302,14 +302,14 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
 
       if (left is BinaryOperatorNode)
       {
-        result += BuildWhereClause(left, parameters);
+        result += " (" + BuildWhereClause(left, parameters) + ") ";
       }
 
       result += " " + operatorNode.OperatorKind;
 
       if (right is BinaryOperatorNode)
       {
-        result += " " + BuildWhereClause(right, parameters);
+        result += " (" + BuildWhereClause(right, parameters) + ") ";
       }
 
       return result;

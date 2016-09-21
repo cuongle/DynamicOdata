@@ -63,7 +63,7 @@ namespace DynamicOdata.Service.Impl.SchemaReaders
 		                c.name as Name,
 		                c.is_identity as IsPrimaryKey,
 		                c.is_nullable as Nullable,
-		                ty.name as DataType
+		                lower(ty.name) as DataType
                 FROM sys.columns c
                 INNER JOIN sys.views t ON t.object_id = c.object_id
                 INNER JOIN sys.types ty ON c.user_type_id = ty.user_type_id

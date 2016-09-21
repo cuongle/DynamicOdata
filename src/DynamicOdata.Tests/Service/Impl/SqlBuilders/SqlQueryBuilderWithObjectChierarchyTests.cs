@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http.OData;
 using System.Web.Http.OData.Query;
@@ -186,7 +187,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       Assert.IsTrue(
         sqlQuery.Query.ToLower()
           .Contains(
-            $"([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}) and ([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key})".ToLower()),
+            $"(([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}))  and (([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key}))".ToLower()),
         sqlQuery.Query);
     }
 
@@ -208,7 +209,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       Assert.IsTrue(
         sqlQuery.Query.ToLower()
           .Contains(
-            $"([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}) or ([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key})".ToLower()),
+            $"(([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}))  or (([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key}))".ToLower()),
         sqlQuery.Query);
     }
 
@@ -302,6 +303,28 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
     }
 
     [Test]
+    public void ToSql_FilterContainsBrackets_SqlWhereClauseContainsBrackets()
+    {
+      var idProperty = TestModelBuilder.TestEntityName_IdPropertyName;
+      var nameProperty = TestModelBuilder.TestEntityName_NamePropertyName;
+      var filter = $@"({ idProperty } lt 10 or { idProperty } gt 100) and { nameProperty } eq null";
+
+      // Arrange
+      var oDataQueryOptions = CreateODataQueryOptions($@"{"http://localhost:81"}/{TestModelBuilder.TestEntityName}?$filter={filter}");
+
+      // Act
+      var sqlQuery = _sut.ToSql(oDataQueryOptions);
+      var param1 = sqlQuery.Parameters.First(x => 10 == (int) x.Value).Key;
+      var param2 = sqlQuery.Parameters.First(x => 100 == (int) x.Value).Key;
+
+      // Assert
+      var normalizedWhitespaceSql = Regex.Replace(sqlQuery.Query, @"\s+", " ");
+      Assert.IsTrue(
+        normalizedWhitespaceSql.Contains($"WHERE ( (([{idProperty}] < @{param1})) Or (([{idProperty}] > @{param2})) ) And"),
+        normalizedWhitespaceSql);
+    }
+
+    [Test]
     public void ToSqlCount_WhereHierarchicalNamePassed_ItIsReplacedInSql()
     {
       // Arrange
@@ -353,7 +376,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       Assert.IsTrue(
         sqlQuery.Query.ToLower()
           .Contains(
-            $"([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}) and ([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key})".ToLower()),
+            $"(([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}))  and (([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key}))".ToLower()),
         sqlQuery.Query);
       Assert.IsTrue(sqlQuery.Query.ToLower().StartsWith($"select count(*)"), sqlQuery.Query);
     }
@@ -376,7 +399,7 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       Assert.IsTrue(
         sqlQuery.Query.ToLower()
           .Contains(
-            $"([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}) or ([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key})".ToLower()),
+            $"(([{TestModelBuilder.TestEntityName_NamePropertyName}] = @{firstOrDefault.Key}))  or (([{TestModelBuilder.TestEntityName_SurnamePropertyName}] != @{firstOrDefault2.Key}))".ToLower()),
         sqlQuery.Query);
       Assert.IsTrue(sqlQuery.Query.ToLower().StartsWith($"select count(*)"), sqlQuery.Query);
     }

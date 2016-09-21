@@ -203,3 +203,4 @@ dump.rdb
 *.GhostDoc.xml
 /tests
 
+src/.vs/config/applicationhost.config

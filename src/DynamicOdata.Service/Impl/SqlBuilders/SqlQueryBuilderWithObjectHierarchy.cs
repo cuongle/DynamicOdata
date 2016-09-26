@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Web.Http.OData.Query;
@@ -37,6 +38,21 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
                                                     | AllowedQueryOptions.OrderBy
                                                     | AllowedQueryOptions.Skip
                                                     | AllowedQueryOptions.Top;
+
+      SetMaxNodeCountFromConfigFile();
+    }
+
+    private static void SetMaxNodeCountFromConfigFile()
+    {
+      string customMaxNodeCount = ConfigurationManager.AppSettings["DynamicOData.ODataValidation.MaxNodeCount"];
+      if (string.IsNullOrEmpty(customMaxNodeCount) == false)
+      {
+        int maxNodeCountValue;
+        if (int.TryParse(customMaxNodeCount, out maxNodeCountValue) && maxNodeCountValue >= 1)
+        {
+          _supportedODataQueryOptions.MaxNodeCount = maxNodeCountValue;
+        }
+      }
     }
 
     public SqlQueryBuilderWithObjectHierarchy(char objectHierarchySeparator)

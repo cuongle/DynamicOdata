@@ -484,6 +484,35 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       Assert.IsTrue(sqlQuery.Query.ToLower().StartsWith($"select count(*)"), sqlQuery.Query);
     }
 
+    [Test]
+    public void SetMaxNodeCountFromConfigFile_sets_values([Values("123", "456")]string maxNodeCountCase)
+    {
+      ConfigurationManager.AppSettings["DynamicOData.ODataValidation.MaxNodeCount"] = maxNodeCountCase;
+
+      SqlQueryBuilderWithObjectHierarchy myClass = new SqlQueryBuilderWithObjectHierarchy('.');
+
+      var method = myClass.GetType()
+        .GetMethod("SetMaxNodeCountFromConfigFile", BindingFlags.Static | BindingFlags.NonPublic);
+      method.Invoke(null, null);
+
+      Assert.That(SqlQueryBuilderWithObjectHierarchy.GetSupportedODataQueryOptions().MaxNodeCount, Is.EqualTo(int.Parse(maxNodeCountCase)));
+    }
+
+    [Test]
+    public void SetMaxNodeCountFromConfigFile_doesnt_override_value_on_wrong_value([Values("", "-1")]string maxNodeCountTestCase)
+    {
+      int defaultValue = SqlQueryBuilderWithObjectHierarchy.GetSupportedODataQueryOptions().MaxNodeCount;
+      ConfigurationManager.AppSettings["DynamicOData.ODataValidation.MaxNodeCount"] = maxNodeCountTestCase;
+
+      SqlQueryBuilderWithObjectHierarchy myClass = new SqlQueryBuilderWithObjectHierarchy('.');
+
+      var method = myClass.GetType()
+        .GetMethod("SetMaxNodeCountFromConfigFile", BindingFlags.Static | BindingFlags.NonPublic);
+      method.Invoke(null, null);
+
+      Assert.That(SqlQueryBuilderWithObjectHierarchy.GetSupportedODataQueryOptions().MaxNodeCount, Is.EqualTo(defaultValue));
+    }
+
     private ODataQueryOptions CreateODataQueryOptions(string uri)
     {
       HttpRequestMessage message = new HttpRequestMessage();

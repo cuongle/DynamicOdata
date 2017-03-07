@@ -251,7 +251,13 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       paths.Reverse();
 
       var columnName = string.Join(_objectHierarchySeparator.ToString(), paths);
-      var parameterName = $"{string.Join("_", paths)}_{Guid.NewGuid().ToString("N")}";
+
+      var parameterName = string.Join("_", paths);
+
+      var parameterAlreadyAddedCount = parameters.Keys.Count(w => w.StartsWith(parameterName, StringComparison.InvariantCultureIgnoreCase));
+
+      parameterName = $"{parameterName}_{parameterAlreadyAddedCount}";
+
       parameters.Add(parameterName, valueNode.Value);
 
       return $"([{columnName}] {operatorString} @{parameterName})";

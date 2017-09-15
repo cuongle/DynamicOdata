@@ -10,7 +10,8 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       oDataValidationSettings.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
       oDataValidationSettings.AllowedFunctions = AllowedFunctions.StartsWith
                                                  | AllowedFunctions.EndsWith
-                                                 | AllowedFunctions.Substring;
+                                                 | AllowedFunctions.Substring
+                                                 | AllowedFunctions.SubstringOf;
       oDataValidationSettings.AllowedLogicalOperators = AllowedLogicalOperators.All;
       oDataValidationSettings.AllowedQueryOptions = AllowedQueryOptions.Filter
                                                     | AllowedQueryOptions.InlineCount

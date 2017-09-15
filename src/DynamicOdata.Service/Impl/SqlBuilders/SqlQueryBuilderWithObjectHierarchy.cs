@@ -31,7 +31,8 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       _supportedODataQueryOptions.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
       _supportedODataQueryOptions.AllowedFunctions = AllowedFunctions.StartsWith
                                                  | AllowedFunctions.EndsWith
-                                                 | AllowedFunctions.Substring;
+                                                 | AllowedFunctions.Substring 
+                                                 | AllowedFunctions.SubstringOf;
       _supportedODataQueryOptions.AllowedLogicalOperators = AllowedLogicalOperators.All;
       _supportedODataQueryOptions.AllowedQueryOptions = AllowedQueryOptions.Filter
                                                     | AllowedQueryOptions.InlineCount

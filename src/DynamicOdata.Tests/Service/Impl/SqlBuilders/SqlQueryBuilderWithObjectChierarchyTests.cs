@@ -11,6 +11,7 @@ using System.Web.Http.OData;
 using System.Web.Http.OData.Query;
 using DynamicOdata.Service.Impl.SqlBuilders;
 using DynamicOdata.Tests.Service.Impl.ResultTransformers;
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.Data.Edm;
 using NUnit.Framework;
 
@@ -499,6 +500,38 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
 
       Assert.That(SqlQueryBuilderWithObjectHierarchy.GetSupportedODataQueryOptions().MaxNodeCount, Is.EqualTo(int.Parse(maxNodeCountCase)));
     }
+
+    [Test]
+    public void SqlQueryBuilderWithObjectHierarchy_Use_SupportedODataQueryOptions_GetDefaultDataServiceV2()
+    {
+      SqlQueryBuilderWithObjectHierarchy myClass = new SqlQueryBuilderWithObjectHierarchy('.');
+      var getSupportedODataQueryOptions = myClass.GetType().GetMethod("GetSupportedODataQueryOptions", BindingFlags.Static | BindingFlags.Public);
+   
+      var compareResult = new CompareLogic().Compare(getSupportedODataQueryOptions.Invoke(null, null),
+          SupportedODataQueryOptions.GetDefaultDataServiceV2());
+      Assert.IsTrue(compareResult.AreEqual);
+    }
+
+    [TestCase(AllowedArithmeticOperators.Add, AllowedFunctions.All, AllowedLogicalOperators.Equal, AllowedQueryOptions.Filter)]
+    [TestCase(AllowedArithmeticOperators.Add | AllowedArithmeticOperators.Modulo, AllowedFunctions.Cast | AllowedFunctions.Concat, AllowedLogicalOperators.Equal, AllowedQueryOptions.Filter)]
+    [TestCase(AllowedArithmeticOperators.Add | AllowedArithmeticOperators.Modulo, AllowedFunctions.Cast | AllowedFunctions.Concat, AllowedLogicalOperators.Equal, AllowedQueryOptions.Filter | AllowedQueryOptions.Format)]
+    public void SqlQueryBuilderWithObjectHierarchy_Use_SupportedODataQueryOptions_from_parameter(AllowedArithmeticOperators allowedArithmeticOperators, AllowedFunctions allowedFunctions, AllowedLogicalOperators allowedLogicalOperators, AllowedQueryOptions allowedQueryOptions)
+    {
+      ODataValidationSettings dataValidationSettings = new ODataValidationSettings
+      {
+        AllowedArithmeticOperators = allowedArithmeticOperators,
+        AllowedFunctions = allowedFunctions,
+        AllowedLogicalOperators = allowedLogicalOperators,
+        AllowedQueryOptions = allowedQueryOptions
+      };
+
+      SqlQueryBuilderWithObjectHierarchy myClass = new SqlQueryBuilderWithObjectHierarchy('.', dataValidationSettings);
+      var getSupportedODataQueryOptions = myClass.GetType().GetMethod("GetSupportedODataQueryOptions", BindingFlags.Static | BindingFlags.Public);
+
+      var compareResult = new CompareLogic().Compare(getSupportedODataQueryOptions.Invoke(null, null), dataValidationSettings);
+      Assert.IsTrue(compareResult.AreEqual);
+    }
+
 
     [Test]
     public void SetMaxNodeCountFromConfigFile_doesnt_override_value_on_wrong_value([Values("", "-1")]string maxNodeCountTestCase)

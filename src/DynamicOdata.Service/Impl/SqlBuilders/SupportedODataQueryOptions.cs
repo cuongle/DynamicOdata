@@ -6,18 +6,20 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
   {
     public static ODataValidationSettings GetDefaultDataServiceV2()
     {
-      var oDataValidationSettings = new ODataValidationSettings();
-      oDataValidationSettings.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
-      oDataValidationSettings.AllowedFunctions = AllowedFunctions.StartsWith
+      var oDataValidationSettings = new ODataValidationSettings
+      {
+        AllowedArithmeticOperators = AllowedArithmeticOperators.None,
+        AllowedFunctions = AllowedFunctions.StartsWith
                                                  | AllowedFunctions.EndsWith
                                                  | AllowedFunctions.Substring
-                                                 | AllowedFunctions.SubstringOf;
-      oDataValidationSettings.AllowedLogicalOperators = AllowedLogicalOperators.All;
-      oDataValidationSettings.AllowedQueryOptions = AllowedQueryOptions.Filter
+                                                 | AllowedFunctions.SubstringOf,
+        AllowedLogicalOperators = AllowedLogicalOperators.All,
+        AllowedQueryOptions = AllowedQueryOptions.Filter
                                                     | AllowedQueryOptions.InlineCount
                                                     | AllowedQueryOptions.OrderBy
                                                     | AllowedQueryOptions.Skip
-                                                    | AllowedQueryOptions.Top;
+                                                    | AllowedQueryOptions.Top
+      };
 
       return oDataValidationSettings;
     }

@@ -116,7 +116,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AppReadme\Compare-NET-Objects-Help.txt" />
     <Content Include="TestDatabase.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -506,10 +506,21 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
     {
       SqlQueryBuilderWithObjectHierarchy myClass = new SqlQueryBuilderWithObjectHierarchy('.');
       var getSupportedODataQueryOptions = myClass.GetType().GetMethod("GetSupportedODataQueryOptions", BindingFlags.Static | BindingFlags.Public);
-   
+
       var compareResult = new CompareLogic().Compare(getSupportedODataQueryOptions.Invoke(null, null),
           SupportedODataQueryOptions.GetDefaultDataServiceV2());
       Assert.IsTrue(compareResult.AreEqual);
+    }
+
+    [Test]
+    public void SqlQueryBuilderWithObjectHierarchy_Use_SupportedODataQueryOptions_GetDefaultDataServiceV2_Contains_SubstringOf()
+    {
+      SqlQueryBuilderWithObjectHierarchy myClass = new SqlQueryBuilderWithObjectHierarchy('.');
+      var getSupportedODataQueryOptions = myClass.GetType().GetMethod("GetSupportedODataQueryOptions", BindingFlags.Static | BindingFlags.Public);
+
+      var allowedFunctions = ((ODataValidationSettings)getSupportedODataQueryOptions.Invoke(null, null)).AllowedFunctions;
+
+     Assert.IsTrue(allowedFunctions.HasFlag(AllowedFunctions.SubstringOf));
     }
 
     [TestCase(AllowedArithmeticOperators.Add, AllowedFunctions.All, AllowedLogicalOperators.Equal, AllowedQueryOptions.Filter)]

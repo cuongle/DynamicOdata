@@ -487,6 +487,22 @@ namespace DynamicOdata.Tests.Service.Impl.SqlBuilders
       Assert.IsTrue(sqlQuery.Query.ToLower().StartsWith($"select count(*)"), sqlQuery.Query);
     }
 
+
+    [Test]
+    public void ToSqlSubstirngOf_ReturnsLikeInSql()
+    {
+      // Arrange
+      const string param = "1";
+      var oDataQueryOptions = CreateODataQueryOptions($"http://localhost:81/{TestModelBuilder.TestEntityName}?$filter=substringof('{param}',{TestModelBuilder.TestEntityName_NamePropertyName})");
+
+      // Act
+      var sqlQuery = _sut.ToCountSql(oDataQueryOptions);
+
+      // Assert
+      Assert.IsTrue(sqlQuery.Query.Contains($"{TestModelBuilder.TestEntityName_NamePropertyName} like '%{param}%'"), sqlQuery.Query);
+      Assert.IsTrue(sqlQuery.Query.ToLower().StartsWith($"select count(*)"), sqlQuery.Query);
+    }
+
     [Test]
     public void SetMaxNodeCountFromConfigFile_sets_values([Values("123", "456")]string maxNodeCountCase)
     {

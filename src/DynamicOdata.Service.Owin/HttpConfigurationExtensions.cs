@@ -32,9 +32,10 @@ namespace DynamicOdata.Service.Owin
       var routeName = $"ODataService_{Guid.NewGuid().ToString("N")}";
 
       ODataServiceSettings settings = new ODataServiceSettings();
-      BuildDefaultConfiguration(settings);
 
       configureSettings(settings);
+
+      BuildDefaultConfiguration(settings);
 
       EdmModel edmModel = settings.Services.EdmModelBuilder(settings).GetModel();
       IDataService dataService = settings.Services.DataService(settings);
@@ -63,7 +64,7 @@ namespace DynamicOdata.Service.Owin
       settings.Services.SchemaReader = s => new SchemaViewsReader(s.ConnectionString, s.Schema);
       settings.Services.EdmModelBuilder = s => new EdmObjectHierarchyModelBuilder(s.Services.SchemaReader(s));
       settings.Services.DataService =
-        s => new DataServiceV2(s.ConnectionString, new SqlQueryBuilderWithObjectHierarchy('.'), new RowsToEdmObjectHierarchyResultTransformer('.'));
+        s => new DataServiceV2(s.ConnectionString, new SqlQueryBuilderWithObjectHierarchy('.' , s.ValidationSettings), new RowsToEdmObjectHierarchyResultTransformer('.'));
     }
   }
 }

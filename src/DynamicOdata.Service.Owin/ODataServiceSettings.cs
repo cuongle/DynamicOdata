@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DynamicOdata.Service.Impl.SqlBuilders;
+using System;
+using System.Web.Http.OData.Query;
 
 namespace DynamicOdata.Service.Owin
 {
@@ -6,6 +8,8 @@ namespace DynamicOdata.Service.Owin
   {
     internal ODataServiceSettings()
     {
+      ValidationSettings = SupportedODataQueryOptions.GetDefaultDataServiceV2();
+
       Services = new ODataServiceSettingsServices();
     }
 
@@ -15,7 +19,9 @@ namespace DynamicOdata.Service.Owin
 
     public string Schema { get; set; }
 
-    public ODataServiceSettingsServices Services { get; private set; }
+    public ODataValidationSettings ValidationSettings { get; }
+
+    public ODataServiceSettingsServices Services { get; }
   }
 
   public class ODataServiceSettingsServices

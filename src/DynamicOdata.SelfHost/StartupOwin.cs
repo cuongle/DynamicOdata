@@ -33,6 +33,7 @@ namespace DynamicOdata.SelfHost
         config,
         oDataServiceSettings =>
         {
+          oDataServiceSettings.ValidationSettings.AllowedFunctions = System.Web.Http.OData.Query.AllowedFunctions.All;
           oDataServiceSettings.ConnectionString = ConfigurationManager.ConnectionStrings["first"].ConnectionString;
           oDataServiceSettings.RoutePrefix = "odata";
           oDataServiceSettings.Schema = "dbo";

@@ -25,21 +25,7 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
         new SubstringOfFunction(),
         new StartsWithFunction(),
         new EndsWithFunction());
-
-      _supportedODataQueryOptions = new ODataValidationSettings();
-
-      _supportedODataQueryOptions.AllowedArithmeticOperators = AllowedArithmeticOperators.None;
-      _supportedODataQueryOptions.AllowedFunctions = AllowedFunctions.StartsWith
-                                                 | AllowedFunctions.EndsWith
-                                                 | AllowedFunctions.Substring 
-                                                 | AllowedFunctions.SubstringOf;
-      _supportedODataQueryOptions.AllowedLogicalOperators = AllowedLogicalOperators.All;
-      _supportedODataQueryOptions.AllowedQueryOptions = AllowedQueryOptions.Filter
-                                                    | AllowedQueryOptions.InlineCount
-                                                    | AllowedQueryOptions.OrderBy
-                                                    | AllowedQueryOptions.Skip
-                                                    | AllowedQueryOptions.Top;
-
+      
       SetMaxNodeCountFromConfigFile();
     }
 
@@ -56,8 +42,10 @@ namespace DynamicOdata.Service.Impl.SqlBuilders
       }
     }
 
-    public SqlQueryBuilderWithObjectHierarchy(char objectHierarchySeparator)
+    public SqlQueryBuilderWithObjectHierarchy(char objectHierarchySeparator, ODataValidationSettings validationSettings = null)
     {
+      _supportedODataQueryOptions = validationSettings??SupportedODataQueryOptions.GetDefaultDataServiceV2();
+
       if (objectHierarchySeparator <= 0)
       {
         throw new ArgumentOutOfRangeException(nameof(objectHierarchySeparator));
